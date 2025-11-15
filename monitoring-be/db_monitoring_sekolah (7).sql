@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 25, 2025 at 12:24 PM
+-- Generation Time: Nov 15, 2025 at 03:03 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `db_monitoring_sekolah`
+-- Database: `db_monitoring_sekolah1`
 --
 
 -- --------------------------------------------------------
@@ -60,7 +60,22 @@ INSERT INTO `absensi` (`id`, `siswa_id`, `kelas_id`, `tanggal`, `status`, `guru_
 (53, 19, 17, '2025-10-19', 'Sakit', 12),
 (54, 12, 17, '2025-10-19', 'Sakit', 12),
 (55, 23, 17, '2025-10-19', 'Sakit', 12),
-(56, 16, 17, '2025-10-19', 'Sakit', 12);
+(56, 16, 17, '2025-10-19', 'Sakit', 12),
+(57, 19, 17, '2023-04-01', 'Hadir', 12),
+(58, 12, 17, '2023-04-01', 'Sakit', 12),
+(59, 23, 17, '2023-04-01', 'Izin', 12),
+(60, 16, 17, '2023-04-01', 'Alpha', 12),
+(61, 19, 17, '2025-10-30', 'Hadir', 12),
+(62, 12, 17, '2025-10-30', 'Hadir', 12),
+(63, 23, 17, '2025-10-30', 'Hadir', 12),
+(64, 2, 17, '2025-10-30', 'Hadir', 12),
+(65, 16, 17, '2025-10-30', 'Hadir', 12),
+(66, 2, 21, '2024-01-28', 'Hadir', 12),
+(67, 19, 17, '2027-12-12', 'Hadir', 12),
+(68, 12, 17, '2027-12-12', 'Hadir', 12),
+(69, 23, 17, '2027-12-12', 'Sakit', 12),
+(70, 2, 17, '2027-12-12', 'Sakit', 12),
+(71, 16, 17, '2027-12-12', 'Sakit', 12);
 
 -- --------------------------------------------------------
 
@@ -104,7 +119,10 @@ INSERT INTO `catatan_detail` (`id`, `header_id`, `pengirim_id`, `pesan`, `create
 (22, 17, 37, 'a', '2025-10-24 10:56:20'),
 (24, 19, 37, 'sadasdadasdasd', '2025-10-24 11:07:10'),
 (26, 21, 37, 'sdasdasdasda11', '2025-10-24 11:43:14'),
-(27, 21, 37, 'Test', '2025-10-25 04:14:28');
+(27, 21, 37, 'Test', '2025-10-25 04:14:28'),
+(28, 21, 37, 'test', '2025-10-26 20:57:16'),
+(29, 11, 38, 'baik ibu terimakasih', '2025-10-31 19:30:00'),
+(30, 22, 6, 'asdasdasdasd', '2025-11-14 10:15:59');
 
 -- --------------------------------------------------------
 
@@ -141,14 +159,92 @@ INSERT INTO `catatan_header` (`id`, `guru_id`, `orangtua_id`, `siswa_id`, `kateg
 (8, 12, 6, 16, 'Netral', 'Lainnya', 17, NULL, 'Dibaca', '2025-10-22 04:00:00', '2025-10-22 04:00:00'),
 (9, 12, 1, 19, 'Positif', 'Prestasi', 17, NULL, 'Terkirim', '2025-10-21 07:00:00', '2025-10-21 07:00:00'),
 (10, 12, 2, 23, 'Negatif', 'Perilaku', 17, NULL, 'Dibaca', '2025-10-21 08:00:00', '2025-10-21 08:00:00'),
-(11, 4, 4, 2, 'Positif', 'Akademik', 18, 4, 'Terkirim', '2025-10-23 01:00:00', '2025-10-23 01:00:00'),
+(11, 4, 4, 2, 'Positif', 'Akademik', 18, 4, 'Dibaca', '2025-10-23 01:00:00', '2025-10-31 19:30:00'),
 (12, 4, 4, 11, 'Positif', 'Prestasi', 18, NULL, 'Dibaca', '2025-10-23 02:30:00', '2025-10-23 02:30:00'),
 (13, 4, 4, 24, 'Netral', 'Kehadiran', 18, NULL, 'Terkirim', '2025-10-23 03:00:00', '2025-10-23 03:00:00'),
 (14, 4, 4, 1, 'Positif', 'Akademik', 18, 4, 'Dibaca', '2025-10-22 07:00:00', '2025-10-22 07:00:00'),
-(15, 4, 4, 2, 'Negatif', 'Perilaku', 18, NULL, 'Terkirim', '2025-10-22 08:00:00', '2025-10-22 08:00:00'),
+(15, 4, 4, 2, 'Negatif', 'Perilaku', 18, NULL, 'Dibaca', '2025-10-22 08:00:00', '2025-10-31 19:17:27'),
 (17, 4, 3, 12, 'Positif', 'Akademik', 17, 5, 'Terkirim', '2025-10-24 09:56:41', '2025-10-24 10:56:20'),
 (19, 4, 1, 19, 'Positif', 'Akademik', 17, NULL, 'Terkirim', '2025-10-24 11:07:10', '2025-10-24 11:07:10'),
-(21, 4, 2, 23, 'Positif', 'Akademik', 17, NULL, 'Terkirim', '2025-10-24 11:43:14', '2025-10-25 04:14:28');
+(21, 4, 2, 23, 'Positif', 'Akademik', 17, NULL, 'Terkirim', '2025-10-24 11:43:14', '2025-10-26 20:57:16'),
+(22, 6, 1, 19, 'Positif', 'Akademik', 17, 5, 'Terkirim', '2025-11-14 10:15:59', '2025-11-14 10:15:59');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chat_conversations`
+--
+
+CREATE TABLE `chat_conversations` (
+  `id` int(11) NOT NULL,
+  `guru_id` int(11) NOT NULL COMMENT 'ID guru (from guru table)',
+  `ortu_id` int(11) NOT NULL COMMENT 'ID orang tua (from orangtua table)',
+  `siswa_id` int(11) NOT NULL COMMENT 'ID siswa (context untuk conversation)',
+  `last_message` text DEFAULT NULL COMMENT 'Pesan terakhir (for preview)',
+  `last_message_time` timestamp NULL DEFAULT NULL COMMENT 'Waktu pesan terakhir',
+  `unread_count_guru` int(11) DEFAULT 0 COMMENT 'Jumlah pesan belum dibaca oleh guru',
+  `unread_count_ortu` int(11) DEFAULT 0 COMMENT 'Jumlah pesan belum dibaca oleh ortu',
+  `is_archived_guru` tinyint(1) DEFAULT 0 COMMENT 'Archived by guru?',
+  `is_archived_ortu` tinyint(1) DEFAULT 0 COMMENT 'Archived by ortu?',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tabel percakapan chat antara guru dan orangtua';
+
+--
+-- Dumping data for table `chat_conversations`
+--
+
+INSERT INTO `chat_conversations` (`id`, `guru_id`, `ortu_id`, `siswa_id`, `last_message`, `last_message_time`, `unread_count_guru`, `unread_count_ortu`, `is_archived_guru`, `is_archived_ortu`, `created_at`, `updated_at`) VALUES
+(1, 12, 1, 19, 'Terima kasih Bu Guru atas informasinya', '2025-10-25 03:30:00', 2, 0, 0, 0, '2025-10-26 09:45:42', '2025-10-26 09:45:42'),
+(2, 4, 3, 12, 'test', '2025-10-26 10:08:55', 0, 2, 0, 0, '2025-10-26 09:45:42', '2025-10-26 10:08:55'),
+(3, 12, 2, 23, 'Siap Bu Guru, akan saya perhatikan', '2025-10-23 04:00:00', 0, 0, 0, 0, '2025-10-26 09:45:42', '2025-10-26 09:45:42'),
+(4, 4, 1, 19, 'Halo', '2025-10-26 10:15:02', 0, 1, 0, 0, '2025-10-26 10:15:02', '2025-10-26 10:15:02'),
+(5, 4, 4, 2, 'seshat', '2025-10-31 22:01:40', 0, 0, 0, 0, '2025-10-31 21:45:13', '2025-11-13 14:26:13'),
+(6, 12, 4, 2, 'hlo', '2025-10-31 22:36:41', 1, 0, 0, 0, '2025-10-31 22:36:41', '2025-10-31 22:36:41'),
+(7, 6, 1, 19, 'Halo', '2025-11-14 11:12:45', 0, 1, 0, 0, '2025-11-14 11:12:41', '2025-11-14 11:12:45');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chat_messages`
+--
+
+CREATE TABLE `chat_messages` (
+  `id` int(11) NOT NULL,
+  `conversation_id` int(11) NOT NULL COMMENT 'ID conversation',
+  `sender_id` int(11) NOT NULL COMMENT 'ID user yang kirim (from users table)',
+  `sender_role` enum('guru','ortu') NOT NULL COMMENT 'Role pengirim',
+  `message` text NOT NULL COMMENT 'Isi pesan',
+  `is_read` tinyint(1) DEFAULT 0 COMMENT 'Sudah dibaca?',
+  `read_at` timestamp NULL DEFAULT NULL COMMENT 'Waktu dibaca',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tabel pesan chat';
+
+--
+-- Dumping data for table `chat_messages`
+--
+
+INSERT INTO `chat_messages` (`id`, `conversation_id`, `sender_id`, `sender_role`, `message`, `is_read`, `read_at`, `created_at`) VALUES
+(1, 1, 12, 'guru', 'Selamat pagi Pak Budi. Saya ingin menginformasikan bahwa Ahmad Rizki menunjukkan peningkatan yang baik dalam pelajaran matematika minggu ini.', 1, '2025-10-25 02:05:00', '2025-10-25 02:00:00'),
+(2, 1, 17, 'ortu', 'Selamat pagi Bu Guru. Terima kasih atas informasinya. Kami sangat senang mendengar kabar baik ini.', 1, '2025-10-25 02:20:00', '2025-10-25 02:15:00'),
+(3, 1, 12, 'guru', 'Namun, Ahmad masih perlu bimbingan ekstra dalam materi geometri. Mungkin Bapak bisa membantu latihan di rumah?', 1, '2025-10-25 02:30:00', '2025-10-25 02:25:00'),
+(4, 1, 17, 'ortu', 'Baik Bu, saya akan bantu Ahmad latihan geometri setiap malam. Apakah ada buku referensi yang Bu Guru rekomendasikan?', 0, NULL, '2025-10-25 03:00:00'),
+(5, 1, 17, 'ortu', 'Terima kasih Bu Guru atas informasinya', 0, NULL, '2025-10-25 03:30:00'),
+(6, 2, 37, 'guru', 'Selamat siang Pak Ahmad. Ahmad sering terlambat masuk kelas dalam 3 hari terakhir. Mohon perhatian Bapak untuk memastikan Ahmad berangkat lebih pagi.', 1, '2025-10-24 07:00:00', '2025-10-24 06:00:00'),
+(7, 2, 20, 'ortu', 'Baik Bu, saya mengerti', 1, '2025-10-24 08:30:00', '2025-10-24 08:00:00'),
+(8, 2, 37, 'guru', 'Terima kasih atas perhatiannya Pak. Semoga besok Ahmad bisa datang tepat waktu.', 0, NULL, '2025-10-24 09:00:00'),
+(9, 3, 12, 'guru', 'Selamat pagi Bu Siti. Ahmad Rizki menunjukkan antusiasme tinggi dalam pelajaran IPA. Sangat aktif bertanya!', 1, '2025-10-23 03:00:00', '2025-10-23 02:00:00'),
+(10, 3, 38, 'ortu', 'Alhamdulillah Bu, terima kasih informasinya. Ahmad memang suka pelajaran IPA.', 1, '2025-10-23 03:30:00', '2025-10-23 03:15:00'),
+(11, 3, 12, 'guru', 'Namun perlu diperhatikan, Ahmad kadang kurang teliti dalam mengerjakan soal hitungan. Tolong dibantu latihan ya Bu.', 1, '2025-10-23 03:45:00', '2025-10-23 03:40:00'),
+(12, 3, 38, 'ortu', 'Siap Bu Guru, akan saya perhatikan', 1, '2025-10-23 04:05:00', '2025-10-23 04:00:00'),
+(13, 2, 37, 'guru', 'test', 0, NULL, '2025-10-26 10:08:55'),
+(14, 4, 37, 'guru', 'Halo', 0, NULL, '2025-10-26 10:15:02'),
+(15, 5, 37, 'guru', 'Halo', 1, '2025-10-31 21:46:21', '2025-10-31 21:45:13'),
+(16, 5, 38, 'ortu', 'iya?', 1, '2025-10-31 22:01:16', '2025-10-31 22:01:08'),
+(17, 5, 37, 'guru', 'gimana sehat', 1, '2025-10-31 22:01:36', '2025-10-31 22:01:20'),
+(18, 5, 38, 'ortu', 'seshat', 1, '2025-11-13 14:26:13', '2025-10-31 22:01:40'),
+(19, 6, 38, 'ortu', 'hlo', 0, NULL, '2025-10-31 22:36:41'),
+(20, 7, 6, 'guru', 'Halo', 0, NULL, '2025-11-14 11:12:45');
 
 -- --------------------------------------------------------
 
@@ -171,7 +267,6 @@ CREATE TABLE `guru` (
 
 INSERT INTO `guru` (`id`, `user_id`, `nama_lengkap`, `nip`, `status`, `created_at`) VALUES
 (1, 1, 'BD', '123232123123', 'aktif', '2025-10-03 11:49:13'),
-(2, NULL, 'Asep', '111111111111', 'tidak-aktif', '2025-10-03 11:49:25'),
 (4, 37, 'Siti Nurhaliza', '198002021234567891', 'aktif', '2025-10-17 04:08:50'),
 (5, 5, 'Budi Santoso', '198003031234567892', 'aktif', '2025-10-17 04:08:50'),
 (6, 6, 'Dewi Anggraini', '198004041234567893', 'aktif', '2025-10-17 04:08:50'),
@@ -228,9 +323,11 @@ CREATE TABLE `kelas` (
 --
 
 INSERT INTO `kelas` (`id`, `nama_kelas`, `wali_kelas_id`, `tahun_ajaran_id`) VALUES
-(17, 'Kelas 1', 12, 17),
+(17, 'Kelas 1', 6, 17),
 (18, 'Kelas 2', 1, 17),
-(19, 'Kelas 3', 5, 17);
+(19, 'Kelas 3', 5, 17),
+(21, 'Absen', 12, 19),
+(22, 'kelas 1', 4, 20);
 
 -- --------------------------------------------------------
 
@@ -253,9 +350,13 @@ CREATE TABLE `kelas_mapel` (
 --
 
 INSERT INTO `kelas_mapel` (`id`, `kelas_id`, `mapel_id`, `guru_id`, `tahun_ajaran_id`, `created_at`, `updated_at`) VALUES
-(29, 17, 5, 4, 17, '2025-10-23 09:36:11', '2025-10-23 09:36:11'),
+(29, 17, 5, 6, 17, '2025-10-23 09:36:11', '2025-11-13 21:15:24'),
 (30, 18, 4, 4, 17, '2025-10-23 09:38:45', '2025-10-23 09:38:45'),
-(31, 19, 4, 4, 17, '2025-10-23 09:40:27', '2025-10-23 09:40:27');
+(31, 19, 4, 4, 17, '2025-10-23 09:40:27', '2025-10-23 09:40:27'),
+(32, 17, 4, 12, 17, '2025-10-30 18:31:13', '2025-10-30 18:31:13'),
+(34, 21, 12, 12, 19, '2025-10-30 23:12:37', '2025-10-30 23:12:37'),
+(35, 22, 4, 4, 20, '2025-11-13 13:25:01', '2025-11-13 13:26:20'),
+(36, 22, 13, 6, 20, '2025-11-13 13:25:06', '2025-11-13 13:25:06');
 
 -- --------------------------------------------------------
 
@@ -275,10 +376,17 @@ CREATE TABLE `kelas_siswa` (
 --
 
 INSERT INTO `kelas_siswa` (`id`, `kelas_id`, `siswa_id`, `tahun_ajaran_id`) VALUES
+(69, 17, 2, 17),
+(71, 21, 2, 19),
 (68, 17, 12, 17),
+(76, 22, 12, 20),
+(73, 19, 15, 17),
 (67, 17, 16, 17),
 (65, 17, 19, 17),
-(66, 17, 23, 17);
+(74, 22, 19, 20),
+(66, 17, 23, 17),
+(75, 22, 23, 20),
+(72, 18, 27, 17);
 
 -- --------------------------------------------------------
 
@@ -352,6 +460,7 @@ CREATE TABLE `nilai` (
   `lm5_ulangan` decimal(5,2) DEFAULT NULL COMMENT 'Sumatif LM5 (Ulangan)',
   `uts` decimal(5,2) DEFAULT NULL COMMENT 'Ujian Tengah Semester',
   `uas` decimal(5,2) DEFAULT NULL COMMENT 'Ujian Akhir Semester',
+  `nilai_akhir` decimal(5,2) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `created_by` int(11) DEFAULT NULL COMMENT 'User ID yang create',
@@ -362,10 +471,13 @@ CREATE TABLE `nilai` (
 -- Dumping data for table `nilai`
 --
 
-INSERT INTO `nilai` (`id`, `siswa_id`, `kelas_id`, `mapel_id`, `tahun_ajaran_id`, `semester`, `lm1_tp1`, `lm1_tp2`, `lm1_tp3`, `lm1_tp4`, `lm2_tp1`, `lm2_tp2`, `lm2_tp3`, `lm2_tp4`, `lm3_tp1`, `lm3_tp2`, `lm3_tp3`, `lm3_tp4`, `lm4_tp1`, `lm4_tp2`, `lm4_tp3`, `lm4_tp4`, `lm5_tp1`, `lm5_tp2`, `lm5_tp3`, `lm5_tp4`, `lm1_ulangan`, `lm2_ulangan`, `lm3_ulangan`, `lm4_ulangan`, `lm5_ulangan`, `uts`, `uas`, `created_at`, `updated_at`, `created_by`, `updated_by`) VALUES
-(5, 19, 17, 1, 17, 'Genap', 85.00, 90.00, 88.00, 92.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 88.00, NULL, NULL, NULL, NULL, 85.00, 90.00, '2025-10-25 10:22:52', '2025-10-25 10:22:52', 12, 12),
-(6, 23, 17, 1, 17, 'Genap', 78.00, 82.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-10-25 10:22:52', '2025-10-25 10:22:52', 12, NULL),
-(7, 16, 17, 1, 17, 'Genap', 85.00, 88.00, 90.00, 87.00, 82.00, 85.00, 83.00, 86.00, 90.00, 92.00, 89.00, 91.00, 78.00, 80.00, 82.00, 79.00, 88.00, 90.00, 87.00, 89.00, 88.00, 84.00, 90.00, 80.00, 88.00, 86.00, 89.00, '2025-10-25 10:22:52', '2025-10-25 10:22:52', 12, 12);
+INSERT INTO `nilai` (`id`, `siswa_id`, `kelas_id`, `mapel_id`, `tahun_ajaran_id`, `semester`, `lm1_tp1`, `lm1_tp2`, `lm1_tp3`, `lm1_tp4`, `lm2_tp1`, `lm2_tp2`, `lm2_tp3`, `lm2_tp4`, `lm3_tp1`, `lm3_tp2`, `lm3_tp3`, `lm3_tp4`, `lm4_tp1`, `lm4_tp2`, `lm4_tp3`, `lm4_tp4`, `lm5_tp1`, `lm5_tp2`, `lm5_tp3`, `lm5_tp4`, `lm1_ulangan`, `lm2_ulangan`, `lm3_ulangan`, `lm4_ulangan`, `lm5_ulangan`, `uts`, `uas`, `nilai_akhir`, `created_at`, `updated_at`, `created_by`, `updated_by`) VALUES
+(96, 19, 17, 5, 17, 'Genap', 10.00, 10.00, 10.00, 10.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.80, '2025-10-27 15:26:06', '2025-11-11 23:12:36', 37, 37),
+(100, 23, 17, 5, 17, 'Genap', 20.00, 20.00, 20.00, 20.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1.60, '2025-10-27 15:26:06', '2025-11-11 23:12:36', 37, 37),
+(104, 12, 17, 5, 17, 'Genap', 30.00, 30.00, 30.00, 30.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2.40, '2025-10-27 15:26:06', '2025-11-11 23:12:36', 37, 37),
+(108, 16, 17, 5, 17, 'Genap', 40.00, 40.00, 40.00, 40.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3.20, '2025-10-27 15:26:06', '2025-11-11 23:12:36', 37, 37),
+(112, 2, 17, 4, 17, 'Genap', 11.00, 22.00, 33.00, 44.00, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 10.00, 12.00, 99.00, 88.00, 77.00, 66.00, 55.00, 37.84, '2025-10-30 18:31:43', '2025-11-11 23:12:36', 12, 12),
+(123, 16, 17, 4, 17, 'Genap', 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, 100.00, '2025-10-30 18:42:48', '2025-11-11 23:12:36', 12, 12);
 
 -- --------------------------------------------------------
 
@@ -513,7 +625,9 @@ CREATE TABLE `tahun_ajaran` (
 
 INSERT INTO `tahun_ajaran` (`id`, `tahun`, `semester`, `tanggal_mulai`, `tanggal_selesai`, `status`) VALUES
 (16, '2027/2028', 'Ganjil', '2027-10-10', '2027-11-11', 'tidak-aktif'),
-(17, '2027/2028', 'Genap', '2027-12-12', '2028-01-01', 'aktif');
+(17, '2027/2028', 'Genap', '2027-12-12', '2028-01-01', 'aktif'),
+(19, '2024/2025', 'Ganjil', '2024-01-01', '2024-06-01', 'tidak-aktif'),
+(20, '2024/2025', 'Genap', '2025-10-01', '2025-12-31', 'tidak-aktif');
 
 -- --------------------------------------------------------
 
@@ -538,27 +652,32 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `nama_lengkap`, `username`, `password`, `role`, `status`, `ortu_id`, `last_login`, `created_at`) VALUES
-(1, 'Isma', '00000001', '$2b$10$f8Lln6goTnc3vNgcfFizyumb4OfXfl4hm4LjkRiHc1nJrmVLfd2Cq', 'admin', 'aktif', NULL, '2025-10-25 03:59:53', '2025-09-23 17:12:03'),
+(1, 'Isma', '00000001', '$2b$10$f8Lln6goTnc3vNgcfFizyumb4OfXfl4hm4LjkRiHc1nJrmVLfd2Cq', 'admin', 'aktif', NULL, '2025-11-13 21:15:14', '2025-09-23 17:12:03'),
 (2, 'BD', '123123123', '$2b$10$Dty2.vEBr9qlMCMErKuG3u/tGIISJ5BS1IJ1y13.sLs0i.UVabQcW', 'guru', 'aktif', NULL, '2025-10-23 09:46:51', '2025-10-03 13:01:45'),
 (5, 'Budi Santoso', '198003031234567892', '$2b$10$f8Lln6goTnc3vNgcfFizyumb4OfXfl4hm4LjkRiHc1nJrmVLfd2Cq', 'guru', 'aktif', NULL, NULL, '2025-10-17 04:08:50'),
-(6, 'Dewi Anggraini', '198004041234567893', '$2b$10$f8Lln6goTnc3vNgcfFizyumb4OfXfl4hm4LjkRiHc1nJrmVLfd2Cq', 'guru', 'aktif', NULL, NULL, '2025-10-17 04:08:50'),
+(6, 'Dewi Anggraini', '198004041234567893', '$2b$10$UYQj.6/sJHWDjAvtRV/iQe9puT/rMchVbmzi1O4J7hNPlxIGdaUu.', 'guru', 'aktif', NULL, '2025-11-14 11:18:53', '2025-10-17 04:08:50'),
 (7, 'Eko Nugroho', '198005051234567894', '$2b$10$f8Lln6goTnc3vNgcfFizyumb4OfXfl4hm4LjkRiHc1nJrmVLfd2Cq', 'guru', 'aktif', NULL, NULL, '2025-10-17 04:08:50'),
 (9, 'Gilang Ramadhan', '198007071234567896', '$2b$10$f8Lln6goTnc3vNgcfFizyumb4OfXfl4hm4LjkRiHc1nJrmVLfd2Cq', 'guru', 'aktif', NULL, NULL, '2025-10-17 04:08:50'),
 (10, 'Hana Prameswari', '198008081234567897', '$2b$10$f8Lln6goTnc3vNgcfFizyumb4OfXfl4hm4LjkRiHc1nJrmVLfd2Cq', 'guru', 'aktif', NULL, NULL, '2025-10-17 04:08:50'),
 (11, 'Imam Prasetyo', '198009091234567898', '$2b$10$f8Lln6goTnc3vNgcfFizyumb4OfXfl4hm4LjkRiHc1nJrmVLfd2Cq', 'guru', 'aktif', NULL, NULL, '2025-10-17 04:08:50'),
-(12, 'Jasmine Putri', '198010101234567899', '$2b$10$HLx6g.V9tPDwqJY9A0T3P.8upgkvNaUV8gnkQpD2D3sKaKVFTvlWu', 'guru', 'aktif', NULL, '2025-10-23 10:50:56', '2025-10-17 04:08:50'),
+(12, 'Jasmine Putri', '198010101234567899', '$2b$10$HLx6g.V9tPDwqJY9A0T3P.8upgkvNaUV8gnkQpD2D3sKaKVFTvlWu', 'guru', 'aktif', NULL, '2025-11-03 08:59:34', '2025-10-17 04:08:50'),
 (17, 'Udin', '0012345678', 'Sekolah20102025', 'ortu', 'aktif', 17, NULL, '2025-10-20 01:25:31'),
 (20, 'asdasd', '12312312312', '$2b$10$.PAVrRFewWGGGPf1udk9GOsjF2B567FApico4qDb7NPQF5MPKQG5W', 'admin', 'aktif', NULL, NULL, '2025-10-20 17:58:50'),
 (21, 'asep1', '1232213131', '$2b$10$ZWKSknq7pRmYbMQd58YmGeMnM3T1eNAYupCTUWLd6geaq.NaNJdR6', 'admin', 'aktif', NULL, NULL, '2025-10-20 18:02:47'),
 (22, 'asep1', '1232123', '$2b$10$xjdR5UQdEPww3X5/qB2LO.YhCvmmdsQxAHAHednQQ7ejOHODUZCLW', 'admin', 'aktif', NULL, NULL, '2025-10-20 18:05:45'),
 (23, 'asep1', '1231231', '$2b$10$8DX5zwfzT/iICnDfwLzmaugU3RHd1fJM03eW.zi/MArM9KfOpd.NW', 'admin', 'aktif', NULL, NULL, '2025-10-20 18:07:02'),
 (24, 'asep1', '123123121', '$2b$10$LsKdRzoIKH5fY1rksTQv3.E3sOPvrIg3s9JdVPrYLYBJYF5sLljZK', 'admin', 'aktif', NULL, NULL, '2025-10-20 18:08:54'),
-(25, 'aseppppppppp', '111111111111', '$2b$10$lx0xjTY0OqytX7SAZ8WxSukjs3eDecdG7PqO7bE/aJBCQxSW0HMnW', 'admin', 'aktif', NULL, NULL, '2025-10-20 18:11:21'),
 (27, 'Kurniawan Sari', '1122334455', '$2b$10$MtrXJql6akDp6cwZoptXpOcN.H68ygxRLufdWos/G.s3jdpk8SufW', 'ortu', 'aktif', 11, NULL, '2025-10-20 18:12:10'),
 (36, 'Admin V1', '12345678', '$2b$10$.O7Lar9YsE2GldD5BaXop.kjm/aBsShjR5qt.7wrBkiSsYDnMmfxG', 'admin', 'aktif', NULL, NULL, '2025-10-21 09:26:53'),
-(37, 'Siti Nurhaliza', '198002021234567891', '$2b$10$06s893mq0mrf48hg3aiP/O7k46Lt0hStDiy4e4LlytP6MgeMb1xuu', 'guru', 'aktif', NULL, '2025-10-25 10:10:34', '2025-10-21 09:31:53'),
-(38, 'Dewi Anggraini', '0012345671', '$2b$10$EivM0bfa6uwkbaTezWNDr.0FvpSzzcg9ny/h8ywC/lP8LL6MmpMva', 'ortu', 'aktif', 4, NULL, '2025-10-21 09:33:12'),
-(40, 'Coba V2', '111222334', '$2b$10$WfQODiEY8Y2n5DpoacTSJO16T0spWVOvd75uiJGPavx6qXivymS8W', 'admin', 'aktif', NULL, NULL, '2025-10-21 09:35:08');
+(37, 'Siti Nurhaliza', '198002021234567891', '$2b$10$06s893mq0mrf48hg3aiP/O7k46Lt0hStDiy4e4LlytP6MgeMb1xuu', 'guru', 'aktif', NULL, '2025-11-13 21:14:18', '2025-10-21 09:31:53'),
+(38, 'Dewi Anggraini', '0012345671', '$2b$10$BT8XmmqbkdUVFuIqo70G8ObP9EhZ2AyLA1bppZasyihqDsK8a1u82', 'ortu', 'aktif', 4, '2025-11-13 16:27:22', '2025-10-21 09:33:12'),
+(40, 'Coba V2', '111222334', '$2b$10$WfQODiEY8Y2n5DpoacTSJO16T0spWVOvd75uiJGPavx6qXivymS8W', 'admin', 'aktif', NULL, NULL, '2025-10-21 09:35:08'),
+(55, 'Ahmad Rizki', '9876543210', '$2b$10$4PLg41x48qrml81E9JbM5eFXBtwyONtLLxZAbEJXKvgP8ZWhSejl.', 'ortu', 'aktif', 3, NULL, '2025-11-12 10:49:16'),
+(57, 'Asep', '111111111111', '$2b$10$O7kLekceoTnSG2ntrBnAA.qiruVWFd/J5oB.6lYonR6w3Yt199RwS', 'guru', 'aktif', NULL, NULL, '2025-11-12 10:49:42'),
+(58, 'adadsasd', '111223322', '$2b$10$tRir4BDGQY4Z5JTzhSgO7Oe1BqzoHCqPbp2LJuwCg5WUn/UBUlVMu', 'admin', 'aktif', NULL, NULL, '2025-11-12 11:55:55'),
+(59, '23131', '11112131231', '$2b$10$lynG4DWDWbiz1npJ6ziTXOpgUVy.RaDtDMCqCxCRdlfwIUW5mL9L6', 'admin', 'aktif', NULL, NULL, '2025-11-12 11:55:55'),
+(61, 'Asuuuu', '0012345677', '$2b$10$pPTzDprRGcxxekoJAaZSluVXm/7Grd0FKrQ/s.YsHyBlSwGptQYzG', 'ortu', 'aktif', 18, NULL, '2025-11-12 11:58:18'),
+(63, 'Budi Santoso', '1231323231', '$2b$10$1MTpn4s1EtbmfC0FJhOIIOWLwqv0saF7Cl.v21Z0ZunpifKIaOI2S', 'ortu', 'aktif', 1, '2025-11-13 20:35:23', '2025-11-13 20:35:10');
 
 --
 -- Indexes for dumped tables
@@ -594,6 +713,26 @@ ALTER TABLE `catatan_header`
   ADD KEY `idx_catatan_kategori` (`kategori`),
   ADD KEY `idx_catatan_jenis` (`jenis`),
   ADD KEY `idx_catatan_status` (`status`);
+
+--
+-- Indexes for table `chat_conversations`
+--
+ALTER TABLE `chat_conversations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_conversation` (`guru_id`,`ortu_id`,`siswa_id`),
+  ADD KEY `idx_guru` (`guru_id`),
+  ADD KEY `idx_ortu` (`ortu_id`),
+  ADD KEY `idx_siswa` (`siswa_id`),
+  ADD KEY `idx_last_message_time` (`last_message_time`);
+
+--
+-- Indexes for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_conversation` (`conversation_id`,`created_at`),
+  ADD KEY `idx_sender` (`sender_id`),
+  ADD KEY `idx_is_read` (`is_read`);
 
 --
 -- Indexes for table `guru`
@@ -701,43 +840,55 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `absensi`
 --
 ALTER TABLE `absensi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT for table `catatan_detail`
 --
 ALTER TABLE `catatan_detail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `catatan_header`
 --
 ALTER TABLE `catatan_header`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- AUTO_INCREMENT for table `chat_conversations`
+--
+ALTER TABLE `chat_conversations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `guru`
 --
 ALTER TABLE `guru`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `kelas`
 --
 ALTER TABLE `kelas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `kelas_mapel`
 --
 ALTER TABLE `kelas_mapel`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `kelas_siswa`
 --
 ALTER TABLE `kelas_siswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- AUTO_INCREMENT for table `mapel`
@@ -749,7 +900,7 @@ ALTER TABLE `mapel`
 -- AUTO_INCREMENT for table `nilai`
 --
 ALTER TABLE `nilai`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=150;
 
 --
 -- AUTO_INCREMENT for table `orangtua`
@@ -773,13 +924,13 @@ ALTER TABLE `siswa`
 -- AUTO_INCREMENT for table `tahun_ajaran`
 --
 ALTER TABLE `tahun_ajaran`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- Constraints for dumped tables
@@ -809,6 +960,21 @@ ALTER TABLE `catatan_header`
   ADD CONSTRAINT `catatan_header_ibfk_3` FOREIGN KEY (`siswa_id`) REFERENCES `siswa` (`id`),
   ADD CONSTRAINT `fk_catatan_kelas` FOREIGN KEY (`kelas_id`) REFERENCES `kelas` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_catatan_mapel` FOREIGN KEY (`mapel_id`) REFERENCES `mapel` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `chat_conversations`
+--
+ALTER TABLE `chat_conversations`
+  ADD CONSTRAINT `chat_conversations_ibfk_1` FOREIGN KEY (`guru_id`) REFERENCES `guru` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `chat_conversations_ibfk_2` FOREIGN KEY (`ortu_id`) REFERENCES `orangtua` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `chat_conversations_ibfk_3` FOREIGN KEY (`siswa_id`) REFERENCES `siswa` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  ADD CONSTRAINT `chat_messages_ibfk_1` FOREIGN KEY (`conversation_id`) REFERENCES `chat_conversations` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `chat_messages_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `guru`

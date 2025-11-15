@@ -1,0 +1,27 @@
+<div class="section">
+    <h3>C. CATATAN PERKEMBANGAN</h3>
+    <% if (catatan_perkembangan && catatan_perkembangan.length > 0) { %>
+      <div class="notes-list">
+        <% catatan_perkembangan.slice(0, 5).forEach((catatan, index) => { %>
+          <div class="note-item">
+            <div class="note-header">
+              <span class="note-number"><%= index + 1 %>.</span>
+              <span class="note-date"><%= new Date(catatan.tanggal).toLocaleDateString('id-ID') %></span>
+              -
+              <span class="note-author"><%= catatan.guru_nama %></span>
+              <span class="note-subject">(<%= catatan.mapel_nama || 'Umum' %>)</span>
+              
+              <% if (catatan.kategori) { %>
+                <span class="badge badge-<%= catatan.kategori.toLowerCase() %>">
+                  <%= catatan.kategori %>
+                </span>
+              <% } %>
+            </div>
+            <p class="note-content"><%= catatan.isi_catatan %></p>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <p class="no-data">Belum ada catatan perkembangan.</p>
+    <% } %>
+  </div>

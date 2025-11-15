@@ -1,0 +1,33 @@
+<div class="section">
+    <h3>B. NILAI AKADEMIK</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th width="50">No</th>
+          <th>Mata Pelajaran</th>
+          <th width="100">Nilai Akhir</th>
+          <th width="80">Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (nilai_akademik && nilai_akademik.length > 0) { %>
+          <% nilai_akademik.forEach((nilai, index) => { %>
+            <tr>
+              <td class="center"><%= index + 1 %></td>
+              <td><%= nilai.nama_mapel %></td>
+              <td class="center">
+                <%= nilai.nilai_akhir ? nilai.nilai_akhir.toFixed(1) : '-' %>
+              </td>
+              <td class="center">
+                <%= nilai.grade || '-' %>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="4" class="no-data">Belum ada data nilai.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>

@@ -1,0 +1,118 @@
+/* PENTING! File ini TIDAK BOLEH berisi @page { margin: 0; }
+  atau body { margin: 0; }
+  Biarkan body bersih agar "patuh" pada margin Puppeteer.
+*/
+
+body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 11pt;
+  line-height: 1.6;
+  color: #000;
+}
+
+/* Judul Bagian (A, B, C...) */
+.section {
+  margin-bottom: 20px;
+  page-break-inside: avoid; /* Mencegah bagian ini terpotong antar halaman */
+}
+
+.section h3 {
+  font-size: 12pt;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #333;
+}
+
+/* Info Siswa (Grid 2 Kolom) */
+.info-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0 20px; /* Jarak antar kolom */
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 3px;
+}
+.info-row .label { min-width: 100px; }
+.info-row .colon { margin: 0 8px; }
+.info-row .value { font-weight: bold; }
+
+
+/* Tabel (Untuk Nilai & Absensi) */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid #000;
+  padding: 6px;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: #e8e8e8;
+  font-weight: bold;
+  text-align: center;
+}
+.data-table td.center { text-align: center; }
+
+/* Daftar Catatan */
+.notes-list { margin: 10px 0; }
+.note-item {
+  margin-bottom: 15px;
+  page-break-inside: avoid;
+}
+.note-header { font-size: 10pt; color: #555; }
+.note-header .note-number { font-weight: bold; }
+.note-header .note-author { font-weight: bold; }
+.note-header .note-subject { font-style: italic; }
+.note-content { margin-top: 3px; }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 8pt;
+  font-weight: bold;
+  border-radius: 3px;
+  margin-left: 5px;
+  color: white;
+}
+.badge-positif { background-color: #28a745; }
+.badge-negatif { background-color: #dc3545; }
+.badge-netral { background-color: #6c757d; }
+
+/* Box Catatan Wali Kelas */
+.catatan-text {
+  font-size: 10pt;
+  padding: 10px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  min-height: 50px;
+}
+
+/* Tanda Tangan */
+.footer {
+  margin-top: 40px;
+  page-break-inside: avoid;
+}
+.signature-section {
+  text-align: right;
+  width: 40%; /* Mengambil 40% di sisi kanan */
+  margin-left: auto; /* Mendorong ke kanan */
+}
+.signature-section .date { margin-bottom: 5px; }
+.signature-section .role { margin-bottom: 60px; } /* Ruang untuk TTD */
+.signature-section .name { text-decoration: underline; font-weight: bold; }
+.signature-section .nip { margin-top: 5px; }
+
+.no-data {
+  text-align: center;
+  font-style: italic;
+  color: #999;
+  padding: 20px;
+}

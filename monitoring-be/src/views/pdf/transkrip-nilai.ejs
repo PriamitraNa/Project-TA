@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transkrip Nilai - <%= siswa.nama %></title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Times New Roman', serif;
+      font-size: 11pt;
+      line-height: 1.6;
+      color: #000;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 100%;
+    }
+
+    /* Identitas Siswa */
+    .identitas-siswa {
+      margin-bottom: 20px;
+    }
+
+    .identitas-siswa h3 {
+      font-size: 12pt;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 5px;
+    }
+
+    .identitas-siswa table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .identitas-siswa td {
+      padding: 5px 0;
+      vertical-align: top;
+    }
+
+    .identitas-siswa td:first-child {
+      width: 150px;
+      font-weight: bold;
+    }
+
+    .identitas-siswa td:nth-child(2) {
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Riwayat Nilai */
+    .riwayat-section {
+      margin-bottom: 30px;
+      page-break-inside: avoid;
+    }
+
+    .semester-header {
+      background-color: #f0f0f0;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-left: 4px solid #333;
+    }
+
+    .semester-header h4 {
+      font-size: 11pt;
+      margin: 0;
+    }
+
+    .semester-header p {
+      font-size: 10pt;
+      margin: 2px 0 0 0;
+      color: #555;
+    }
+
+    /* Tabel Nilai */
+    .nilai-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+
+    .nilai-table th,
+    .nilai-table td {
+      border: 1px solid #000;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .nilai-table th {
+      background-color: #e0e0e0;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .nilai-table td:nth-child(1) {
+      width: 40px;
+      text-align: center;
+    }
+
+    .nilai-table td:nth-child(3),
+    .nilai-table td:nth-child(4) {
+      width: 80px;
+      text-align: center;
+    }
+
+    .grade-A {
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    .grade-B {
+      color: #1976d2;
+      font-weight: bold;
+    }
+
+    .grade-C {
+      color: #f57c00;
+      font-weight: bold;
+    }
+
+    .grade-D {
+      color: #c62828;
+      font-weight: bold;
+    }
+
+    /* Absensi */
+    .absensi-box {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .absensi-item {
+      text-align: center;
+    }
+
+    .absensi-item .label {
+      font-size: 9pt;
+      color: #666;
+    }
+
+    .absensi-item .value {
+      font-size: 14pt;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* Footer */
+    .footer-info {
+      margin-top: 30px;
+      text-align: right;
+      font-size: 10pt;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+      font-style: italic;
+    }
+
+    /* Page Break */
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- IDENTITAS SISWA -->
+    <div class="identitas-siswa">
+      <table>
+        <tr>
+          <td>Nama Lengkap</td>
+          <td>:</td>
+          <td><%= siswa.nama %></td>
+        </tr>
+        <tr>
+          <td>NISN</td>
+          <td>:</td>
+          <td><%= siswa.nisn %></td>
+        </tr>
+        <tr>
+          <td>Kelas Saat Ini</td>
+          <td>:</td>
+          <td><%= siswa.kelas %></td>
+        </tr>
+        <tr>
+          <td>Nama Orang Tua/Wali</td>
+          <td>:</td>
+          <td><%= siswa.nama_ortu %></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- RIWAYAT NILAI PER SEMESTER -->
+    <% if (riwayat_nilai && riwayat_nilai.length > 0) { %>
+      <% riwayat_nilai.forEach((semester, index) => { %>
+        <div class="riwayat-section">
+          
+          <!-- Semester Header -->
+          <div class="semester-header">
+            <h4><%= semester.tahun_ajaran %> - Semester <%= semester.semester %></h4>
+            <p>Kelas: <%= semester.kelas %></p>
+          </div>
+
+          <!-- Absensi -->
+          <div class="absensi-box">
+            <div class="absensi-item">
+              <div class="label">Hadir</div>
+              <div class="value"><%= semester.absensi.hadir %></div>
+            </div>
+            <div class="absensi-item">
+              <div class="label">Sakit</div>
+              <div class="value"><%= semester.absensi.sakit %></div>
+            </div>
+            <div class="absensi-item">
+              <div class="label">Izin</div>
+              <div class="value"><%= semester.absensi.izin %></div>
+            </div>
+            <div class="absensi-item">
+              <div class="label">Alpha</div>
+              <div class="value"><%= semester.absensi.alpha %></div>
+            </div>
+          </div>
+
+          <!-- Tabel Nilai -->
+          <table class="nilai-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Mata Pelajaran</th>
+                <th>Nilai</th>
+                <th>Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (semester.nilai && semester.nilai.length > 0) { %>
+                <% semester.nilai.forEach((mapel, idx) => { %>
+                  <tr>
+                    <td><%= idx + 1 %></td>
+                    <td><%= mapel.nama_mapel %></td>
+                    <td><%= mapel.nilai_akhir %></td>
+                    <td class="grade-<%= mapel.grade %>"><%= mapel.grade %></td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="4" class="no-data">Belum ada nilai</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+
+        </div>
+
+        <!-- Page break setelah setiap 2 semester (opsional) -->
+        <% if ((index + 1) % 2 === 0 && index < riwayat_nilai.length - 1) { %>
+          <div class="page-break"></div>
+        <% } %>
+
+      <% }); %>
+    <% } else { %>
+      <div class="no-data">
+        <p>Belum ada riwayat nilai untuk siswa ini.</p>
+      </div>
+    <% } %>
+
+    <!-- FOOTER -->
+    <div class="footer-info">
+      <p>Dicetak pada: <%= tanggal_cetak %></p>
+    </div>
+
+  </div>
+</body>
+</html>

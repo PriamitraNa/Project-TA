@@ -1,0 +1,173 @@
+import db from '../../config/db.js';
+
+/**
+ * Get siswa yang sudah memiliki data nilai
+ * Filter by kelas_id, tahun_ajaran_id, search (nama/NISN)
+ */
+export const getSiswaWithNilai = ({ kelas_id, tahun_ajaran_id, search }) => {
+  return new Promise((resolve, reject) => {
+    let query = `
+      SELECT DISTINCT
+        s.id AS siswa_id,
+        s.nama_lengkap,
+        s.nisn,
+        k.nama_kelas AS kelas,
+        ta.tahun AS tahun_ajaran,
+        ta.semester,
+        COUNT(DISTINCT n.mapel_id) AS jumlah_mapel_dinilai
+      FROM siswa s
+      INNER JOIN nilai n ON s.id = n.siswa_id
+      INNER JOIN kelas k ON n.kelas_id = k.id
+      INNER JOIN tahun_ajaran ta ON n.tahun_ajaran_id = ta.id
+      WHERE 1=1
+    `;
+    
+    const params = [];
+    
+    // Filter by tahun_ajaran_id (default: aktif)
+    if (tahun_ajaran_id) {
+      query += ` AND n.tahun_ajaran_id = ?`;
+      params.push(tahun_ajaran_id);
+    } else {
+      query += ` AND ta.status = 'aktif'`;
+    }
+    
+    // Filter by kelas_id
+    if (kelas_id) {
+      query += ` AND n.kelas_id = ?`;
+      params.push(kelas_id);
+    }
+    
+    // Search by nama or NISN
+    if (search) {
+      query += ` AND (s.nama_lengkap LIKE ? OR s.nisn LIKE ?)`;
+      const searchPattern = `%${search}%`;
+      params.push(searchPattern, searchPattern);
+    }
+    
+    // Group by siswa
+    query += `
+      GROUP BY s.id, s.nama_lengkap, s.nisn, k.nama_kelas, ta.tahun, ta.semester
+      ORDER BY s.nama_lengkap ASC
+    `;
+    
+    db.query(query, params, (error, results) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(results);
+    });
+  });
+};
+
+/**
+ * Get siswa info with current kelas and nama ortu
+ */
+export const getSiswaInfoWithKelas = (siswaId) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        s.id AS siswa_id,
+        s.nama_lengkap AS nama,
+        s.nisn,
+        s.tempat_lahir,
+        s.tanggal_lahir,
+        COALESCE(k.nama_kelas, '-') AS kelas,
+        COALESCE(
+          (SELECT o.nama_lengkap 
+           FROM orangtua_siswa os 
+           JOIN orangtua o ON os.orangtua_id = o.id 
+           WHERE os.siswa_id = s.id 
+           LIMIT 1),
+          'Tidak Ada Data'
+        ) AS nama_ortu
+      FROM siswa s
+      LEFT JOIN kelas_siswa ks ON s.id = ks.siswa_id 
+        AND ks.tahun_ajaran_id = (SELECT id FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1)
+      LEFT JOIN kelas k ON ks.kelas_id = k.id
+      WHERE s.id = ?
+      LIMIT 1
+    `;
+    
+    db.query(query, [siswaId], (error, results) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(results[0] || null);
+    });
+  });
+};
+
+/**
+ * Get nilai per semester dengan tahun_ajaran_id dan mapel_id
+ */
+export const getNilaiPerSemesterWithId = (siswaId) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        ta.id AS tahun_ajaran_id,
+        ta.tahun AS tahun_ajaran,
+        ta.semester,
+        k.nama_kelas AS kelas,
+        m.id AS mapel_id,
+        m.nama_mapel AS mapel,
+        n.nilai_akhir,
+        CASE 
+          WHEN n.nilai_akhir >= 85 THEN 'A'
+          WHEN n.nilai_akhir >= 70 THEN 'B'
+          WHEN n.nilai_akhir >= 55 THEN 'C'
+          ELSE 'D'
+        END AS grade
+      FROM nilai n
+      INNER JOIN tahun_ajaran ta ON n.tahun_ajaran_id = ta.id
+      INNER JOIN kelas k ON n.kelas_id = k.id
+      INNER JOIN mapel m ON n.mapel_id = m.id
+      WHERE n.siswa_id = ?
+      ORDER BY ta.tahun DESC, ta.semester ASC, m.nama_mapel ASC
+    `;
+    
+    db.query(query, [siswaId], (error, results) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(results);
+    });
+  });
+};
+
+/**
+ * Get absensi per semester
+ */
+export const getAbsensiPerSemester = (siswaId) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        ta.id AS tahun_ajaran_id,
+        ta.semester,
+        COUNT(CASE WHEN a.status = 'Hadir' THEN 1 END) AS hadir,
+        COUNT(CASE WHEN a.status = 'Sakit' THEN 1 END) AS sakit,
+        COUNT(CASE WHEN a.status = 'Izin' THEN 1 END) AS izin,
+        COUNT(CASE WHEN a.status = 'Alpha' THEN 1 END) AS alpha
+      FROM absensi a
+      INNER JOIN kelas k ON a.kelas_id = k.id
+      INNER JOIN tahun_ajaran ta ON k.tahun_ajaran_id = ta.id
+      WHERE a.siswa_id = ?
+      GROUP BY ta.id, ta.semester
+      ORDER BY ta.tahun DESC, ta.semester ASC
+    `;
+    
+    db.query(query, [siswaId], (error, results) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(results);
+    });
+  });
+};
+
+export default {
+  getSiswaWithNilai,
+  getSiswaInfoWithKelas,
+  getNilaiPerSemesterWithId,
+  getAbsensiPerSemester
+};

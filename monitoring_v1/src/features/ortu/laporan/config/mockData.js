@@ -1,0 +1,111 @@
+// Mock data untuk development (akan diganti dengan API call)
+export const MOCK_LAPORAN_DATA = {
+  '2025/2026': {
+    ganjil: [
+      {
+        id: 1,
+        mapel: 'Matematika',
+        kkm: 75,
+        nilaiAkhir: 78,
+        predikat: 'C',
+        deskripsi: 'Perlu meningkatkan pemahaman konsep dasar.',
+      },
+      {
+        id: 2,
+        mapel: 'Bahasa Indonesia',
+        kkm: 75,
+        nilaiAkhir: 88,
+        predikat: 'A',
+        deskripsi: 'Sangat baik dalam pemahaman teks dan menulis.',
+      },
+      {
+        id: 3,
+        mapel: 'IPA',
+        kkm: 75,
+        nilaiAkhir: 87,
+        predikat: 'A',
+        deskripsi: 'Memiliki rasa ingin tahu yang tinggi.',
+      },
+      {
+        id: 4,
+        mapel: 'IPS',
+        kkm: 75,
+        nilaiAkhir: 82,
+        predikat: 'B',
+        deskripsi: 'Baik dalam memahami sejarah dan geografi.',
+      },
+      {
+        id: 5,
+        mapel: 'PKN',
+        kkm: 75,
+        nilaiAkhir: 95,
+        predikat: 'A',
+        deskripsi: 'Sangat baik dalam memahami nilai Pancasila.',
+      },
+      {
+        id: 6,
+        mapel: 'Bahasa Inggris',
+        kkm: 75,
+        nilaiAkhir: 85,
+        predikat: 'A',
+        deskripsi: 'Pronunciation baik, perlu latihan grammar.',
+      },
+      {
+        id: 7,
+        mapel: 'Seni Budaya',
+        kkm: 75,
+        nilaiAkhir: 90,
+        predikat: 'A',
+        deskripsi: 'Kreatif dan berbakat di bidang seni rupa.',
+      },
+      {
+        id: 8,
+        mapel: 'PJOK',
+        kkm: 75,
+        nilaiAkhir: 88,
+        predikat: 'A',
+        deskripsi: 'Aktif dan sportif dalam kegiatan olahraga.',
+      },
+    ],
+    genap: [
+      {
+        id: 1,
+        mapel: 'Matematika',
+        kkm: 75,
+        nilaiAkhir: 89,
+        predikat: 'A',
+        deskripsi: 'Menunjukkan peningkatan yang signifikan.',
+      },
+      {
+        id: 2,
+        mapel: 'Bahasa Indonesia',
+        kkm: 75,
+        nilaiAkhir: 90,
+        predikat: 'A',
+        deskripsi: 'Konsisten mempertahankan prestasi baik.',
+      },
+    ],
+  },
+  '2024/2025': {
+    ganjil: [
+      {
+        id: 1,
+        mapel: 'Matematika',
+        kkm: 75,
+        nilaiAkhir: 84,
+        predikat: 'B',
+        deskripsi: 'Cukup baik, perlu lebih banyak latihan.',
+      },
+    ],
+    genap: [
+      {
+        id: 1,
+        mapel: 'Bahasa Indonesia',
+        kkm: 75,
+        nilaiAkhir: 88,
+        predikat: 'A',
+        deskripsi: 'Sangat baik dalam menulis karangan.',
+      },
+    ],
+  },
+}

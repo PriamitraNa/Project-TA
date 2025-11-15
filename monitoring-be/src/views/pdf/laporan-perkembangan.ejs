@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Laporan Perkembangan - <%= siswa.nama %></title>
+  
+  <style>
+    <%- include('styles/pdf-styles') %>
+  </style>
+  
+</head>
+<body>
+
+  <%- include('partials/student-info', { siswa: siswa, tahunAjaran: tahunAjaran }) %>
+
+  <%- include('partials/academic-grades', { nilai_akademik: nilai_akademik }) %>
+
+  <%- include('partials/notes', { catatan_perkembangan: catatan_perkembangan }) %>
+
+  <div class="section">
+    <h3>CATATAN WALI KELAS</h3>
+    <p class="catatan-text">
+      <%= catatan_wali_kelas %>
+    </p>
+  </div>
+
+  <%- include('partials/attendance', { absensi: absensi }) %>
+
+  <%- include('partials/footer', { guru: guru, tanggal_cetak: tanggal_cetak }) %>
+
+</body>
+</html>

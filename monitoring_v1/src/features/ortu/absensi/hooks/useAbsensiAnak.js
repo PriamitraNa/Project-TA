@@ -11,9 +11,11 @@ export function useAbsensiAnak() {
   // State untuk filter tahun ajaran & semester
   const [tahunAjaranList, setTahunAjaranList] = useState([])
   const [semesterList, setSemesterList] = useState([])
+  const [semesterData, setSemesterData] = useState([]) // Data semester lengkap dengan tahun_ajaran_id
   const [bulanList, setBulanList] = useState([]) // Daftar bulan dari API
-  const [selectedTahunAjaran, setSelectedTahunAjaran] = useState(null)
-  const [selectedSemester, setSelectedSemester] = useState(null)
+  const [selectedTahunAjaran, setSelectedTahunAjaran] = useState('') // String tahun (e.g., "2025/2026")
+  const [selectedTahunAjaranId, setSelectedTahunAjaranId] = useState('') // ID dari semester response
+  const [selectedSemester, setSelectedSemester] = useState('') // Value semester: "1" atau "2"
   const [selectedBulan, setSelectedBulan] = useState('') // Format: '01' - '12', empty = semua
 
   // State untuk data
@@ -35,12 +37,16 @@ export function useAbsensiAnak() {
     try {
       const response = await AbsensiAnakService.getTahunAjaran()
       if (response.status === 'success') {
-        setTahunAjaranList(response.data.tahun_ajaran || [])
+        // Response: [{ "tahun": "2025/2026" }, { "tahun": "2024/2025" }]
+        const options = (response.data.tahun_ajaran || []).map((ta) => ({
+          value: ta.tahun,
+          label: `T.A ${ta.tahun}`,
+        }))
+        setTahunAjaranList(options)
 
-        // Auto-select tahun ajaran aktif jika ada
-        const aktif = response.data.tahun_ajaran.find((ta) => ta.status === 'aktif')
-        if (aktif) {
-          setSelectedTahunAjaran(aktif.id)
+        // Auto-select first option
+        if (options.length > 0) {
+          setSelectedTahunAjaran(options[0].value)
         }
       }
     } catch (error) {
@@ -56,25 +62,36 @@ export function useAbsensiAnak() {
   }, [])
 
   // Load semester list berdasarkan tahun ajaran
-  const loadSemester = useCallback(async (tahunAjaranId) => {
-    if (!tahunAjaranId) {
+  const loadSemester = useCallback(async (tahunAjaran) => {
+    if (!tahunAjaran) {
       setSemesterList([])
-      setSelectedSemester(null)
+      setSemesterData([])
+      setSelectedSemester('')
+      setSelectedTahunAjaranId('')
       return
     }
 
     try {
-      const response = await AbsensiAnakService.getSemester(tahunAjaranId)
+      const response = await AbsensiAnakService.getSemester(tahunAjaran)
       if (response.status === 'success') {
-        setSemesterList(response.data.semester || [])
+        // Response: [{ "id": 1, "nama": "Semester 1 (Ganjil)", "value": "1" }, { "id": 2, "nama": "Semester 2 (Genap)", "value": "2" }]
+        const semData = response.data.semester || []
+        setSemesterData(semData)
 
-        // Auto-select semester aktif jika ada
-        const aktif = response.data.semester.find((s) => s.status === 'aktif')
-        if (aktif) {
-          setSelectedSemester(aktif.value)
-        } else if (response.data.semester.length > 0) {
-          // Jika tidak ada yang aktif, pilih yang pertama
-          setSelectedSemester(response.data.semester[0].value)
+        // Map untuk dropdown
+        const options = semData.map((s) => ({
+          value: s.value,
+          label: s.nama,
+        }))
+        setSemesterList(options)
+
+        // Auto-select first option
+        if (options.length > 0 && semData.length > 0) {
+          setSelectedSemester(options[0].value)
+          setSelectedTahunAjaranId(semData[0].id.toString())
+        } else {
+          setSelectedSemester('')
+          setSelectedTahunAjaranId('')
         }
       }
     } catch (error) {
@@ -89,7 +106,9 @@ export function useAbsensiAnak() {
         toast.error('Gagal mengambil data semester')
       }
       setSemesterList([])
-      setSelectedSemester(null)
+      setSemesterData([])
+      setSelectedSemester('')
+      setSelectedTahunAjaranId('')
     }
   }, [])
 
@@ -174,7 +193,7 @@ export function useAbsensiAnak() {
   // Load detail absensi untuk tabel (terpengaruh filter bulan)
   const loadDetail = useCallback(async () => {
     // Harus pilih tahun ajaran dan semester dulu
-    if (!selectedTahunAjaran || !selectedSemester) {
+    if (!selectedTahunAjaranId || !selectedSemester) {
       setAbsensiData([])
       return
     }
@@ -183,7 +202,7 @@ export function useAbsensiAnak() {
     try {
       // Panggil API dengan bulan (optional)
       const response = await AbsensiAnakService.getDetail(
-        selectedTahunAjaran,
+        selectedTahunAjaranId,
         selectedSemester,
         selectedBulan || null // null jika "Semua Bulan"
       )
@@ -213,7 +232,7 @@ export function useAbsensiAnak() {
     } finally {
       setIsLoading(false)
     }
-  }, [selectedTahunAjaran, selectedSemester, selectedBulan])
+  }, [selectedTahunAjaranId, selectedSemester, selectedBulan])
 
   // Load tahun ajaran saat mount
   useEffect(() => {
@@ -226,44 +245,57 @@ export function useAbsensiAnak() {
       loadSemester(selectedTahunAjaran)
     } else {
       setSemesterList([])
-      setSelectedSemester(null)
+      setSemesterData([])
+      setSelectedSemester('')
+      setSelectedTahunAjaranId('')
     }
   }, [selectedTahunAjaran, loadSemester])
 
-  // Load bulan saat semester berubah
+  // Update tahun_ajaran_id saat semester berubah
   useEffect(() => {
-    if (selectedTahunAjaran && selectedSemester) {
-      loadBulan(selectedTahunAjaran, selectedSemester)
+    if (selectedSemester && semesterData.length > 0) {
+      const selected = semesterData.find((sem) => sem.value === selectedSemester)
+      if (selected) {
+        setSelectedTahunAjaranId(selected.id.toString())
+      }
+    }
+  }, [selectedSemester, semesterData])
+
+  // Load bulan saat semester berubah (gunakan tahun_ajaran_id)
+  useEffect(() => {
+    if (selectedTahunAjaranId && selectedSemester) {
+      loadBulan(selectedTahunAjaranId, selectedSemester)
     } else {
       setBulanList([])
       setSelectedBulan('')
     }
-  }, [selectedTahunAjaran, selectedSemester, loadBulan])
+  }, [selectedTahunAjaranId, selectedSemester, loadBulan])
 
   // Load summary saat tahun ajaran atau semester berubah (TIDAK terpengaruh bulan)
   useEffect(() => {
-    if (selectedTahunAjaran && selectedSemester) {
-      loadSummary(selectedTahunAjaran, selectedSemester)
+    if (selectedTahunAjaranId && selectedSemester) {
+      loadSummary(selectedTahunAjaranId, selectedSemester)
     }
-  }, [selectedTahunAjaran, selectedSemester, loadSummary])
+  }, [selectedTahunAjaranId, selectedSemester, loadSummary])
 
   // Load detail saat filter berubah (TERPENGARUH bulan)
   useEffect(() => {
-    if (selectedTahunAjaran && selectedSemester) {
+    if (selectedTahunAjaranId && selectedSemester) {
       loadDetail()
     }
-  }, [selectedTahunAjaran, selectedSemester, selectedBulan, loadDetail])
+  }, [selectedTahunAjaranId, selectedSemester, selectedBulan, loadDetail])
 
   // Handlers
-  const handleTahunAjaranChange = (tahunAjaranId) => {
-    setSelectedTahunAjaran(tahunAjaranId || null)
-    // Reset semester dan bulan
-    setSelectedSemester(null)
+  const handleTahunAjaranChange = (tahunAjaran) => {
+    setSelectedTahunAjaran(tahunAjaran || '')
+    // Reset semester, tahun_ajaran_id, dan bulan
+    setSelectedSemester('')
+    setSelectedTahunAjaranId('')
     setSelectedBulan('')
   }
 
   const handleSemesterChange = (semester) => {
-    setSelectedSemester(semester || null)
+    setSelectedSemester(semester || '')
     // Reset bulan
     setSelectedBulan('')
   }

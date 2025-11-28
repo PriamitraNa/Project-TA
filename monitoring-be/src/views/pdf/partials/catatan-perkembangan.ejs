@@ -1,0 +1,21 @@
+<!-- Catatan Perkembangan Section: Untuk Guru dan Ortu -->
+<% if ((role === 'guru' || role === 'ortu') && typeof catatan_perkembangan !== 'undefined') { %>
+<div class="catatan-section">
+  <h3>CATATAN PERKEMBANGAN</h3>
+  <% if (catatan_perkembangan.length > 0) { %> <% catatan_perkembangan.forEach((catatan, index) => {
+  %>
+  <div class="catatan-item">
+    <div class="catatan-meta">
+      <span class="catatan-date"><%= catatan.tanggal_formatted || catatan.tanggal %></span>
+      <span class="catatan-separator">–</span>
+      <span class="catatan-author"><%= catatan.guru_nama %></span>
+    </div>
+    <p class="catatan-text"><%= catatan.isi_catatan %></p>
+  </div>
+  <% }) %> <% } else { %>
+  <div class="catatan-empty">
+    <p>Belum ada catatan perkembangan pada tahun ajaran dan semester ini.</p>
+  </div>
+  <% } %>
+</div>
+<% } %>

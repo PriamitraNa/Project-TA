@@ -15,7 +15,7 @@ export const LaporanService = {
    * @returns {Promise} Response dengan daftar tahun ajaran
    * @example
    * const response = await LaporanService.getTahunAjaran()
-   * // response.data = [{ id: 1, tahun_ajaran: "2025/2026", label: "T.A 2025/2026", is_active: true }]
+   * // response.data = [{ "tahun_ajaran": "2025/2026", "is_active": true }]
    */
   getTahunAjaran: async () => {
     try {
@@ -32,20 +32,20 @@ export const LaporanService = {
   },
 
   /**
-   * API #2: Get Daftar Semester (NEW!)
-   * GET /api/ortu/laporan/semester
+   * API #2: Get Daftar Semester
+   * GET /api/ortu/laporan/semester?tahun_ajaran=2025/2026
    *
-   * @param {number} tahunAjaranId - ID tahun ajaran untuk filter semester
+   * @param {string} tahunAjaran - String tahun ajaran (e.g., "2025/2026")
    * @returns {Promise} Response dengan daftar semester yang tersedia
    * @example
-   * const response = await LaporanService.getSemester(1)
-   * // response.data = [{ id: 1, semester: "1", label: "Semester 1 (Ganjil)", has_nilai: true }]
+   * const response = await LaporanService.getSemester("2025/2026")
+   * // response.data = [{ "tahun_ajaran_id": 1, "semester": "1", "label": "Semester 1 (Ganjil)" }]
    */
-  getSemester: async (tahunAjaranId) => {
+  getSemester: async (tahunAjaran) => {
     try {
       const res = await axios.get(`${API_URL}/ortu/laporan/semester`, {
         params: {
-          tahun_ajaran_id: tahunAjaranId,
+          tahun_ajaran: tahunAjaran,
         },
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
@@ -60,14 +60,14 @@ export const LaporanService = {
 
   /**
    * API #3: Get Laporan Nilai Anak
-   * GET /api/ortu/laporan/nilai
+   * GET /api/ortu/laporan/nilai?tahun_ajaran_id=1&semester=1
    *
-   * @param {number} tahunAjaranId - ID tahun ajaran
+   * @param {number} tahunAjaranId - ID tahun ajaran (dari response semester)
    * @param {string} semester - Semester: '1' atau '2'
    * @returns {Promise} Response dengan data laporan nilai
    * @example
    * const response = await LaporanService.getLaporanNilai(1, '1')
-   * // response.data = { siswa: {...}, nilai: [...], statistik: {...} }
+   * // response.data = [{ mapel_id: 1, nama_mapel: "Matematika", nilai_akhir: 85.5, guru_nama: "Budi" }]
    */
   getLaporanNilai: async (tahunAjaranId, semester) => {
     try {

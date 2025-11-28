@@ -38,6 +38,7 @@ export const getTahunAjaran = async (req, res, next) => {
 /**
  * GET /api/ortu/laporan/semester
  * Get list semester untuk dropdown (hanya yang ada data nilai)
+ * Query param: tahun_ajaran (string, misal: '2025/2026')
  */
 export const getSemester = async (req, res, next) => {
   try {
@@ -58,17 +59,17 @@ export const getSemester = async (req, res, next) => {
       })
     }
 
-    // Get tahun_ajaran_id from query
-    const { tahun_ajaran_id } = req.query
+    // Get tahun_ajaran from query
+    const { tahun_ajaran } = req.query
 
-    if (!tahun_ajaran_id) {
+    if (!tahun_ajaran) {
       return res.status(400).json({
         status: 'error',
-        message: 'Parameter tahun_ajaran_id wajib diisi',
+        message: 'Parameter tahun_ajaran wajib diisi',
       })
     }
 
-    const data = await laporanService.getSemesterService(siswaId, tahun_ajaran_id)
+    const data = await laporanService.getSemesterService(siswaId, tahun_ajaran)
 
     res.status(200).json({
       status: 'success',
@@ -208,7 +209,7 @@ export const downloadPDF = async (req, res, next) => {
     }
 
     // Generate PDF
-    const pdfDoc = await laporanService.generatePDFLaporanService(
+    const pdfBuffer = await laporanService.generatePDFLaporanService(
       siswaId,
       tahun_ajaran_id,
       semester
@@ -229,9 +230,8 @@ export const downloadPDF = async (req, res, next) => {
     res.setHeader('Content-Type', 'application/pdf')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
 
-    // Pipe PDF to response
-    pdfDoc.pipe(res)
-    pdfDoc.end()
+    // Send PDF buffer
+    res.send(pdfBuffer)
   } catch (error) {
     console.error('Error in downloadPDF controller:', error)
 

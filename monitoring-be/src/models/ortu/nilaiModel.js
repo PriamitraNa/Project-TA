@@ -3,12 +3,12 @@ import db from '../../config/db.js'
 /**
  * Get tahun ajaran yang pernah diikuti siswa
  * Berdasarkan siswa_id dari siswa yang linked ke user
+ * Return UNIQUE tahun saja (tanpa duplikat semester)
  */
 export const getTahunAjaranBySiswa = (siswaId) => {
   return new Promise((resolve, reject) => {
     const query = `
       SELECT DISTINCT
-        ta.id as tahun_ajaran_id,
         ta.tahun as tahun_ajaran
       FROM kelas_siswa ks
       JOIN tahun_ajaran ta ON ks.tahun_ajaran_id = ta.id
@@ -27,17 +27,19 @@ export const getTahunAjaranBySiswa = (siswaId) => {
 
 /**
  * Get semester yang pernah diikuti siswa di tahun ajaran tertentu
- * Filter by siswa_id dan tahun_ajaran_id
+ * Filter by siswa_id dan tahun (string tahun ajaran, misal: '2025/2026')
  * Order by ASC (Ganjil dulu, baru Genap)
+ * Return semester yang tersedia (bisa 1 atau 2)
  */
-export const getSemesterBySiswaAndTahun = (siswaId, tahunAjaranId) => {
+export const getSemesterBySiswaAndTahun = (siswaId, tahunAjaran) => {
   return new Promise((resolve, reject) => {
     const query = `
       SELECT DISTINCT
+        ta.id as tahun_ajaran_id,
         ta.semester
       FROM kelas_siswa ks
       JOIN tahun_ajaran ta ON ks.tahun_ajaran_id = ta.id
-      WHERE ks.siswa_id = ? AND ta.id = ?
+      WHERE ks.siswa_id = ? AND ta.tahun = ?
       ORDER BY 
         CASE 
           WHEN ta.semester = 'Ganjil' THEN 1
@@ -46,7 +48,7 @@ export const getSemesterBySiswaAndTahun = (siswaId, tahunAjaranId) => {
         END ASC
     `
 
-    db.query(query, [siswaId, tahunAjaranId], (error, results) => {
+    db.query(query, [siswaId, tahunAjaran], (error, results) => {
       if (error) {
         return reject(error)
       }

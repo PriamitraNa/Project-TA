@@ -40,7 +40,7 @@ export const sidebarMenu = {
     { title: 'Nilai', icon: FaBook, to: '/guru/nilai' },
     { title: 'Catatan', icon: FaCommentDots, to: '/guru/catatan' },
     { title: 'Chat', icon: FaComments, to: '/guru/chat' },
-    { title: 'Laporan Perkembangan', icon: FaFileDownload, to: '/guru/laporan' },
+    { title: 'Laporan Nilai', icon: FaFileDownload, to: '/guru/laporan' },
   ],
   ortu: [
     { title: 'Dashboard', icon: FaUser, to: '/ortu/dashboard' },

@@ -1,0 +1,107 @@
+<!-- Student Info Section: Berbeda per Role -->
+<div class="student-info-section">
+  <% if (role === 'admin') { %>
+  <!-- Layout Admin: 2 Kolom -->
+  <div class="info-grid-2col">
+    <div class="info-column">
+      <div class="info-row">
+        <span class="label">Nama Lengkap</span>
+        <span class="colon">:</span>
+        <span class="value"><%= siswa.nama %></span>
+      </div>
+      <div class="info-row">
+        <span class="label">NISN</span>
+        <span class="colon">:</span>
+        <span class="value"><%= siswa.nisn %></span>
+      </div>
+    </div>
+    <div class="info-column">
+      <div class="info-row">
+        <span class="label">Kelas Saat Ini</span>
+        <span class="colon">:</span>
+        <span class="value"><%= siswa.kelas %></span>
+      </div>
+      <div class="info-row">
+        <span class="label">Nama Orang Tua/Wali</span>
+        <span class="colon">:</span>
+        <span class="value"><%= siswa.nama_ortu %></span>
+      </div>
+    </div>
+  </div>
+  <% } else if (role === 'guru') { %>
+  <!-- Layout Guru: 1 Kolom Vertikal -->
+  <div class="info-single-col">
+    <div class="info-row">
+      <span class="label">Nama</span>
+      <span class="colon">:</span>
+      <span class="value"><%= siswa.nama %></span>
+    </div>
+    <div class="info-row">
+      <span class="label">Tahun Ajaran</span>
+      <span class="colon">:</span>
+      <span class="value"><%= tahunAjaran.tahun %></span>
+    </div>
+    <div class="info-row">
+      <span class="label">Semester</span>
+      <span class="colon">:</span>
+      <span class="value"><%= tahunAjaran.semester %></span>
+    </div>
+    <div class="info-row">
+      <span class="label">NISN</span>
+      <span class="colon">:</span>
+      <span class="value"><%= siswa.nisn %></span>
+    </div>
+    <div class="info-row">
+      <span class="label">Kelas</span>
+      <span class="colon">:</span>
+      <span class="value"><%= siswa.kelas %></span>
+    </div>
+    <div class="info-row">
+      <span class="label">Orang Tua</span>
+      <span class="colon">:</span>
+      <span class="value"><%= siswa.nama_ortu %></span>
+    </div>
+  </div>
+  <% } else if (role === 'ortu') { %>
+  <!-- Layout Ortu: 2 Kolom -->
+  <div class="info-grid-2col">
+    <div class="info-column">
+      <div class="info-row">
+        <span class="label">Nama</span>
+        <span class="colon">:</span>
+        <span class="value"><%= siswa.nama %></span>
+      </div>
+      <div class="info-row">
+        <span class="label">NISN</span>
+        <span class="colon">:</span>
+        <span class="value"><%= siswa.nisn %></span>
+      </div>
+      <div class="info-row">
+        <span class="label">Kelas</span>
+        <span class="colon">:</span>
+        <span class="value"
+          ><%= typeof kelas !== 'undefined' ? kelas : (typeof siswa.kelas_nama !== 'undefined' ?
+          siswa.kelas_nama : '-') %></span
+        >
+      </div>
+    </div>
+    <div class="info-column">
+      <div class="info-row">
+        <span class="label">Tahun Ajaran</span>
+        <span class="colon">:</span>
+        <span class="value"><%= typeof tahunAjaran !== 'undefined' ? tahunAjaran : '-' %></span>
+      </div>
+      <div class="info-row">
+        <span class="label">Semester</span>
+        <span class="colon">:</span>
+        <span class="value"><%= typeof semester !== 'undefined' ? semester : '-' %></span>
+      </div>
+      <div class="info-row">
+        <span class="label">Guru Wali Kelas</span>
+        <span class="colon">:</span>
+        <span class="value"><%= typeof wali_kelas !== 'undefined' ? wali_kelas : '-' %></span>
+      </div>
+    </div>
+  </div>
+  <% } %>
+</div>

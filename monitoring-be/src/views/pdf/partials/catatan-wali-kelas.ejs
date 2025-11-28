@@ -1,0 +1,9 @@
+<!-- Catatan Wali Kelas Section: Hanya untuk Guru -->
+<% if (role === 'guru' && typeof catatan_wali_kelas !== 'undefined') { %>
+<div class="catatan-wali-section">
+  <h3>CATATAN WALI KELAS</h3>
+  <div class="catatan-wali-content">
+    <p><%= catatan_wali_kelas %></p>
+  </div>
+</div>
+<% } %>

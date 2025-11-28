@@ -1,0 +1,151 @@
+@startuml UC-01 Login ke Sistem
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 200
+
+title Sequence Diagram - UC-01: Login ke Sistem
+
+actor User as user
+participant "LoginPage\n(Frontend)" as page
+participant "AuthService\n(Frontend)" as authService
+participant "authController\n(Backend)" as controller
+participant "authService\n(Backend)" as service
+participant "userModel\n(Backend)" as model
+database "MySQL\nDatabase" as db
+
+== Happy Flow: Login Berhasil ==
+
+user -> page: Akses halaman login
+activate page
+page --> user: Tampilkan form login
+deactivate page
+
+user -> page: Input username & password
+activate page
+user -> page: Klik tombol "Login"
+
+page -> page: Set loading = true
+page -> page: Validasi input (required)
+
+page -> authService: login(username, password)
+activate authService
+
+authService -> controller: POST /api/auth/login\n{username, password}
+activate controller
+
+controller -> controller: Validasi input tidak kosong
+alt Input kosong
+    controller --> authService: 400 Bad Request\n"Username dan password wajib diisi"
+    authService --> page: Error response
+    page -> page: Toast error
+    page --> user: Tampilkan pesan error
+    page -> page: Set loading = false
+else Input valid
+    controller -> service: loginService(username, password)
+    activate service
+    
+    service -> service: Validasi username (harus numerik)
+    service -> service: Validasi password (min 8 karakter)
+    
+    alt Validasi gagal
+        service --> controller: throw Error
+        controller --> authService: 400 Bad Request\nError message
+        authService --> page: Error response
+        page -> page: Toast error
+        page --> user: Tampilkan pesan error
+        page -> page: Set loading = false
+    else Validasi berhasil
+        service -> model: findUserWithRoleData(username)
+        activate model
+        
+        model -> db: SELECT u.*, g.nama_lengkap, o.nama_lengkap, s.*\nFROM users u\nLEFT JOIN guru g, orangtua o, siswa s\nWHERE username = ?
+        activate db
+        db --> model: User data with role info
+        deactivate db
+        
+        model --> service: Return user object
+        deactivate model
+        
+        alt User tidak ditemukan
+            service --> controller: throw Error\n"Username tidak valid"
+            controller --> authService: 400 Bad Request
+            authService --> page: Error response
+            page -> page: Toast error
+            page --> user: Tampilkan pesan error
+            page -> page: Set loading = false
+        else User ditemukan
+            service -> service: Cek status user = 'aktif'
+            
+            alt Status tidak aktif
+                service --> controller: throw Error\n"Akun tidak aktif"
+                controller --> authService: 400 Bad Request
+                authService --> page: Error response
+                page -> page: Toast error
+                page --> user: Tampilkan pesan error
+                page -> page: Set loading = false
+            else Status aktif
+                service -> service: bcrypt.compare(password, hash)
+                
+                alt Password salah
+                    service --> controller: throw Error\n"Password salah"
+                    controller --> authService: 400 Bad Request
+                    authService --> page: Error response
+                    page -> page: Toast error
+                    page --> user: Tampilkan pesan error
+                    page -> page: Set loading = false
+                else Password benar
+                    service -> model: updateLastLogin(user.id)
+                    activate model
+                    model -> db: UPDATE users\nSET last_login = NOW()\nWHERE id = ?
+                    activate db
+                    db --> model: Success
+                    deactivate db
+                    deactivate model
+                    
+                    service -> service: Generate JWT token\npayload: {id, role, guru_id/siswa_id}
+                    service -> service: Prepare response data\nsesuai role (admin/guru/ortu)
+                    
+                    service --> controller: Return success\n{token, user data}
+                    deactivate service
+                    
+                    controller --> authService: 200 OK\n{status: "success", data: {token, user}}
+                    deactivate controller
+                    
+                    authService -> authService: saveUserData(token, user)\n- localStorage.setItem("authToken")\n- localStorage.setItem("userRole")\n- localStorage.setItem("userId")\n- localStorage.setItem("userName")
+                    
+                    authService --> page: Return success response
+                    deactivate authService
+                    
+                    page -> page: Get redirect URL based on role:\n- admin → /admin/dashboard\n- guru → /guru/dashboard\n- ortu → /ortu/dashboard
+                    
+                    page -> page: navigate(redirectUrl)
+                    page -> page: Set loading = false
+                    deactivate page
+                    
+                    page --> user: Redirect ke dashboard
+                end
+            end
+        end
+    end
+end
+
+== Alternative Flow: Network Error ==
+
+user -> page: Klik tombol "Login"
+activate page
+page -> authService: login(username, password)
+activate authService
+
+authService -x controller: POST /api/auth/login\n(Network timeout/failure)
+note right: Tidak ada response\ndari server
+
+authService -> authService: Catch network error
+authService --> page: Error: Network error
+page -> page: Toast error\n"Tidak dapat terhubung ke server"
+page --> user: Tampilkan pesan error
+page -> page: Set loading = false
+deactivate page
+deactivate authService
+
+@enduml

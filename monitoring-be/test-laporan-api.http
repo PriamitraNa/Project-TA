@@ -1,0 +1,88 @@
+### Test Laporan Nilai Admin API
+### Base URL
+@baseUrl = http://localhost:5000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzYzOTA2ODA0LCJleHAiOjE3NjM5MTA0MDR9.YBf_KHlwSl_2XryuPlwwpMAp5qWMfn8noX0HLTS1EFs
+
+### ========================================
+### 1. LOGIN (Get Token First)
+### ========================================
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "00000001",
+  "password": "admin123"
+}
+
+### ========================================
+### 2. GET TAHUN AJARAN DROPDOWN
+### ========================================
+GET {{baseUrl}}/admin/laporan/tahun-ajaran
+Authorization: Bearer {{token}}
+
+### ========================================
+### 3. GET KELAS DROPDOWN (by tahun ajaran)
+### Replace tahun_ajaran_id dengan ID dari response #2
+### ========================================
+GET {{baseUrl}}/admin/laporan/kelas?tahun_ajaran_id=1
+Authorization: Bearer {{token}}
+
+### ========================================
+### 4. GET SISWA DROPDOWN (by kelas & tahun ajaran)
+### Replace kelas_id dan tahun_ajaran_id dengan ID dari response sebelumnya
+### ========================================
+GET {{baseUrl}}/admin/laporan/siswa-dropdown?kelas_id=1&tahun_ajaran_id=1
+Authorization: Bearer {{token}}
+
+### ========================================
+### 5. DOWNLOAD INDIVIDUAL PDF (Single Student)
+### Replace siswa_id dengan ID dari response #4
+### ========================================
+GET {{baseUrl}}/admin/laporan/transkrip/1/pdf
+Authorization: Bearer {{token}}
+
+### ========================================
+### 6. DOWNLOAD BULK ZIP (All Students in Kelas)
+### Replace kelas_id dan tahun_ajaran_id dengan ID yang valid
+### ========================================
+POST {{baseUrl}}/admin/laporan/transkrip/bulk
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "kelas_id": 1,
+  "tahun_ajaran_id": 1
+}
+
+### ========================================
+### 7. GET DAFTAR SISWA (OLD ENDPOINT - Still Works)
+### ========================================
+GET {{baseUrl}}/admin/laporan/siswa
+Authorization: Bearer {{token}}
+
+### ========================================
+### 8. GET DAFTAR SISWA (Filtered by Kelas)
+### ========================================
+GET {{baseUrl}}/admin/laporan/siswa?kelas_id=1
+Authorization: Bearer {{token}}
+
+### ========================================
+### 9. GET DAFTAR SISWA (Filtered by Tahun Ajaran)
+### ========================================
+GET {{baseUrl}}/admin/laporan/siswa?tahun_ajaran_id=1
+Authorization: Bearer {{token}}
+
+### ========================================
+### 10. GET DAFTAR SISWA (Search by Name/NISN)
+### ========================================
+GET {{baseUrl}}/admin/laporan/siswa?search=Ahmad
+Authorization: Bearer {{token}}
+
+### ========================================
+### NOTES:
+### ========================================
+### 1. Jalankan request #1 (LOGIN) dulu untuk dapat token
+### 2. Copy token dari response, paste ke variable @token di atas
+### 3. Jalankan request #2-#6 secara berurutan
+### 4. Untuk request #5 dan #6, file akan di-download otomatis
+### 5. Ganti semua ID (tahun_ajaran_id, kelas_id, siswa_id) dengan ID yang valid dari database Anda

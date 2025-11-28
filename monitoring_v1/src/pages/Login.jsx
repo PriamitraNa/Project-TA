@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { assets } from '../assets/assets';
-import Button from '../components/ui/Button';
-import IconInputField from '../components/ui/IconInputField';
-import { FaUser, FaLock } from 'react-icons/fa6';
-import { AuthService } from '../services/Login/authService';
-import toast from 'react-hot-toast';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { assets } from '../assets/assets'
+import Button from '../components/ui/Button'
+import IconInputField from '../components/ui/IconInputField'
+import { FaUser, FaLock } from 'react-icons/fa6'
+import { AuthService } from '../services/Login/authService'
+import toast from 'react-hot-toast'
 
 const ERROR_MESSAGES = {
   UNAUTHORIZED: 'Username atau password salah',
@@ -14,45 +14,45 @@ const ERROR_MESSAGES = {
   SERVER_ERROR: 'Terjadi kesalahan pada server',
   NETWORK_ERROR: 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.',
   UNKNOWN_ERROR: 'Terjadi kesalahan yang tidak terduga',
-};
+}
 
 const HTTP_STATUS = {
   UNAUTHORIZED: 401,
   BAD_REQUEST: 400,
   NOT_FOUND: 404,
   SERVER_ERROR: 500,
-};
+}
 
 const getErrorMessage = (error) => {
   if (error.response) {
-    const { status, data } = error.response;
-    
-    let errorMessage = data?.message || ERROR_MESSAGES.SERVER_ERROR;
-    
+    const { status, data } = error.response
+
+    let errorMessage = data?.message || ERROR_MESSAGES.SERVER_ERROR
+
     if (data?.status === 'error' && data?.message) {
-      errorMessage = data.message;
+      errorMessage = data.message
     }
-    
+
     switch (status) {
       case HTTP_STATUS.UNAUTHORIZED:
-        return errorMessage || ERROR_MESSAGES.UNAUTHORIZED;
+        return errorMessage || ERROR_MESSAGES.UNAUTHORIZED
       case HTTP_STATUS.BAD_REQUEST:
-        return errorMessage || ERROR_MESSAGES.BAD_REQUEST;
+        return errorMessage || ERROR_MESSAGES.BAD_REQUEST
       case HTTP_STATUS.NOT_FOUND:
-        return ERROR_MESSAGES.NOT_FOUND;
+        return ERROR_MESSAGES.NOT_FOUND
       case HTTP_STATUS.SERVER_ERROR:
-        return ERROR_MESSAGES.SERVER_ERROR;
+        return ERROR_MESSAGES.SERVER_ERROR
       default:
-        return errorMessage;
+        return errorMessage
     }
   }
-  
+
   if (error.request) {
-    return ERROR_MESSAGES.NETWORK_ERROR;
+    return ERROR_MESSAGES.NETWORK_ERROR
   }
-  
-  return error.message || ERROR_MESSAGES.UNKNOWN_ERROR;
-};
+
+  return error.message || ERROR_MESSAGES.UNKNOWN_ERROR
+}
 
 const LoginHeader = () => (
   <div className="text-center">
@@ -60,45 +60,53 @@ const LoginHeader = () => (
     <h1 className="text-3xl font-bold text-slate-800">Selamat Datang!</h1>
     <p className="text-slate-500 mt-2">Silakan masuk ke akun Anda</p>
   </div>
-);
+)
 
 const LoginFooter = () => (
   <p className="text-xs text-slate-500 text-center">
     © 2025 Sistem Monitoring Nilai Siswa - SDN 1 Langensari
   </p>
-);
+)
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    setIsLoading(true);
-    
+    setIsLoading(true)
+
     try {
-      const response = await AuthService.login(username, password);
-      
+      const response = await AuthService.login(username, password)
+
       if (response.status === 'success') {
-        const userRole = response.data.user.role;
-        const redirectUrl = AuthService.getRedirectUrl(userRole);
-        navigate(redirectUrl);
+        const { data } = response
+
+        // Cek apakah user harus ganti password
+        // Check di level data.force_password_change (bukan data.user.force_password_change)
+        if (data.force_password_change === true) {
+          navigate('/change-password')
+        } else {
+          const userRole = data.user.role
+          const redirectUrl = AuthService.getRedirectUrl(userRole)
+          navigate(redirectUrl)
+        }
       } else {
-        toast.error(response.message || 'Login gagal');
+        toast.error(response.message || 'Login gagal')
       }
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error(getErrorMessage(error));
+      console.error('Login error:', error)
+      toast.error(getErrorMessage(error))
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    <div 
+    <div
       className="flex items-center justify-center min-h-screen p-4 bg-cover bg-center"
       style={{ backgroundImage: `url(${assets.bgschool})` }}
     >
@@ -126,19 +134,13 @@ export default function LoginPage() {
             required
           />
 
-          <Button 
-            type="submit" 
-            fullWidth 
-            size="lg" 
-            className="!text-base"
-            disabled={isLoading}
-          >
+          <Button type="submit" fullWidth size="lg" className="!text-base" disabled={isLoading}>
             {isLoading ? 'Memproses...' : 'Login'}
           </Button>
         </form>
-            
+
         <LoginFooter />
       </div>
     </div>
-  );
+  )
 }

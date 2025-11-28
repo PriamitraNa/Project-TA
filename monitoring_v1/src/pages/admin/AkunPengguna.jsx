@@ -133,22 +133,24 @@ export default function AkunPengguna() {
       </ContentWrapper>
 
       <div className="mt-5 sm:mt-6 lg:mt-8">
-        <div className="space-y-3 sm:space-y-4">
-          <SearchBar
-            search={searchQuery}
-            setSearch={handleSearch}
-            filter={roleFilter}
-            setFilter={handleRoleFilter}
-            filters={ROLE_FILTERS}
-            filterPlaceholder="Pilih Role"
-            placeholder="Cari nama atau username"
-            onSearch={handleSearch}
-            showFilter
-            showAddButton
-            addButtonText="Tambah Akun"
-            onAddClick={handleTambahAkun}
-          />
-        </div>
+        <ContentWrapper>
+          <div className="space-y-3 sm:space-y-4">
+            <SearchBar
+              search={searchQuery}
+              setSearch={handleSearch}
+              filter={roleFilter}
+              setFilter={handleRoleFilter}
+              filters={ROLE_FILTERS}
+              filterPlaceholder="Pilih Role"
+              placeholder="Cari nama atau username"
+              onSearch={handleSearch}
+              showFilter
+              showAddButton
+              addButtonText="Tambah Akun"
+              onAddClick={handleTambahAkun}
+            />
+          </div>
+        </ContentWrapper>
       </div>
 
       <div className="mt-5 sm:mt-6 lg:mt-8">

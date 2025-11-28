@@ -1,4 +1,4 @@
-import laporanService from '../../services/admin/laporanService.js';
+import laporanService from '../../services/admin/laporanService.js'
 
 /**
  * GET /api/admin/laporan/siswa
@@ -7,22 +7,22 @@ import laporanService from '../../services/admin/laporanService.js';
  */
 export const getDaftarSiswa = async (req, res, next) => {
   try {
-    const { kelas_id, tahun_ajaran_id, search } = req.query;
-    
+    const { kelas_id, tahun_ajaran_id, search } = req.query
+
     const data = await laporanService.getDaftarSiswaService({
       kelas_id: kelas_id ? parseInt(kelas_id) : null,
       tahun_ajaran_id: tahun_ajaran_id ? parseInt(tahun_ajaran_id) : null,
-      search: search || null
-    });
-    
+      search: search || null,
+    })
+
     res.status(200).json({
       status: 'success',
-      data
-    });
+      data,
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 /**
  * GET /api/admin/laporan/transkrip/:siswa_id
@@ -30,27 +30,27 @@ export const getDaftarSiswa = async (req, res, next) => {
  */
 export const getTranskripNilai = async (req, res, next) => {
   try {
-    const { siswa_id } = req.params;
-    
+    const { siswa_id } = req.params
+
     if (!siswa_id) {
       return res.status(400).json({
         success: false,
         message: 'Parameter siswa_id wajib diisi',
-        data: null
-      });
+        data: null,
+      })
     }
-    
-    const data = await laporanService.getTranskripNilaiService(parseInt(siswa_id));
-    
+
+    const data = await laporanService.getTranskripNilaiService(parseInt(siswa_id))
+
     res.status(200).json({
       success: true,
       message: 'Transkrip nilai berhasil diambil',
-      data
-    });
+      data,
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 /**
  * GET /api/admin/laporan/transkrip/:siswa_id/pdf
@@ -58,54 +58,189 @@ export const getTranskripNilai = async (req, res, next) => {
  */
 export const downloadTranskripPDF = async (req, res, next) => {
   try {
-    const { siswa_id } = req.params;
-    
+    const { siswa_id } = req.params
+
     if (!siswa_id) {
       return res.status(400).json({
         success: false,
         message: 'Parameter siswa_id wajib diisi',
-        data: null
-      });
+        data: null,
+      })
     }
-    
+
     // Generate PDF (returns Buffer)
-    const pdfBuffer = await laporanService.generateTranskripPDFService(parseInt(siswa_id));
-    
+    const pdfBuffer = await laporanService.generateTranskripPDFService(parseInt(siswa_id))
+
     // Get siswa data for filename
-    const transkripData = await laporanService.getTranskripNilaiService(parseInt(siswa_id));
-    const siswaName = transkripData.siswa.nama.replace(/\s+/g, '_');
-    const siswanis = transkripData.siswa.nisn;
-    
-    const filename = `Transkrip_${siswaName}_${siswanis}.pdf`;
-    
+    const transkripData = await laporanService.getTranskripNilaiService(parseInt(siswa_id))
+    const siswaName = transkripData.siswa.nama.replace(/\s+/g, '_')
+    const siswanis = transkripData.siswa.nisn
+
+    const filename = `Transkrip_${siswaName}_${siswanis}.pdf`
+
     // Set response headers
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Content-Length', pdfBuffer.length);
-    
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+    res.setHeader('Content-Length', pdfBuffer.length)
+
     // Send buffer directly
-    res.send(pdfBuffer);
-    
+    res.send(pdfBuffer)
   } catch (error) {
     // Handle specific errors
     if (error.message === 'Data siswa tidak ditemukan') {
       return res.status(404).json({
         success: false,
-        message: 'Data transkrip tidak ditemukan'
-      });
+        message: 'Data transkrip tidak ditemukan',
+      })
     }
-    
+
     // Generic error
     return res.status(500).json({
       success: false,
       message: 'Gagal generate PDF',
-      error: error.message
-    });
+      error: error.message,
+    })
   }
-};
+}
+
+/**
+ * GET /api/admin/laporan/tahun-ajaran
+ * Get all tahun ajaran for dropdown
+ */
+export const getTahunAjaranDropdown = async (req, res, next) => {
+  try {
+    const data = await laporanService.getTahunAjaranDropdownService()
+
+    res.status(200).json({
+      success: true,
+      data,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+/**
+ * GET /api/admin/laporan/kelas?tahun_ajaran_id=X
+ * Get kelas by tahun ajaran for dropdown
+ */
+export const getKelasDropdown = async (req, res, next) => {
+  try {
+    const { tahun_ajaran_id } = req.query
+
+    if (!tahun_ajaran_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter tahun_ajaran_id wajib diisi',
+      })
+    }
+
+    const data = await laporanService.getKelasDropdownService(parseInt(tahun_ajaran_id))
+
+    res.status(200).json({
+      success: true,
+      data,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+/**
+ * GET /api/admin/laporan/siswa-dropdown?kelas_id=X&tahun_ajaran_id=Y
+ * Get siswa by kelas and tahun ajaran for dropdown
+ */
+export const getSiswaDropdown = async (req, res, next) => {
+  try {
+    const { kelas_id, tahun_ajaran_id } = req.query
+
+    if (!kelas_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter kelas_id wajib diisi',
+      })
+    }
+
+    if (!tahun_ajaran_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter tahun_ajaran_id wajib diisi',
+      })
+    }
+
+    const data = await laporanService.getSiswaDropdownService(
+      parseInt(kelas_id),
+      parseInt(tahun_ajaran_id)
+    )
+
+    res.status(200).json({
+      success: true,
+      data,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+/**
+ * POST /api/admin/laporan/transkrip/bulk
+ * Generate bulk transkrip for all siswa in a kelas (ZIP format)
+ */
+export const downloadBulkTranskrip = async (req, res, next) => {
+  try {
+    const { kelas_id, tahun_ajaran_id } = req.body
+
+    if (!kelas_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter kelas_id wajib diisi',
+      })
+    }
+
+    if (!tahun_ajaran_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Parameter tahun_ajaran_id wajib diisi',
+      })
+    }
+
+    // Generate ZIP file
+    const { buffer, filename, totalSiswa } = await laporanService.generateBulkTranskripService(
+      parseInt(kelas_id),
+      parseInt(tahun_ajaran_id)
+    )
+
+    // Set response headers
+    res.setHeader('Content-Type', 'application/zip')
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+    res.setHeader('Content-Length', buffer.length)
+    res.setHeader('X-Total-Siswa', totalSiswa) // Custom header for FE info
+
+    // Send ZIP buffer
+    res.send(buffer)
+  } catch (error) {
+    // Handle specific errors
+    if (error.message.includes('tidak ditemukan') || error.message.includes('Tidak ada siswa')) {
+      return res.status(404).json({
+        success: false,
+        message: error.message,
+      })
+    }
+
+    // Generic error
+    return res.status(500).json({
+      success: false,
+      message: 'Gagal generate bulk transkrip',
+    })
+  }
+}
 
 export default {
   getDaftarSiswa,
   getTranskripNilai,
-  downloadTranskripPDF
-};
+  downloadTranskripPDF,
+  getTahunAjaranDropdown,
+  getKelasDropdown,
+  getSiswaDropdown,
+  downloadBulkTranskrip,
+}

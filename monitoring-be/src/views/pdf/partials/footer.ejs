@@ -1,9 +1,36 @@
-<div class="footer">
-    <div class="signature-section">
-      <p class="date">Garut, <%= tanggal_cetak %></p>
-      <p class="role">Wali Kelas,</p>
-      <br><br><br> 
-      <p class="name"><%= guru.nama_lengkap %></p>
-      <p class="nip">NIP. <%= guru.nip || '-' %></p>
-    </div>
-  </div>
+<div class="footer" style="width: 100%; margin-top: 40px">
+  <table style="width: 100%; border: none">
+    <tr>
+      <td style="width: 50%; text-align: center; vertical-align: top">
+        <div style="margin-bottom: 10px">Mengetahui,</div>
+
+        <div style="font-weight: bold; margin-bottom: 80px">Kepala Sekolah</div>
+
+        <div
+          style="
+            font-weight: bold;
+            text-decoration: underline;
+            min-width: 200px;
+            display: inline-block;
+          "
+        >
+          ___________________________
+        </div>
+
+        <div style="margin-top: 5px; font-size: 10pt">NIP: ___________________________</div>
+      </td>
+
+      <td style="width: 50%; text-align: center; vertical-align: top">
+        <div style="font-weight: normal; margin-bottom: 10px">Garut, <%= tanggal_cetak %></div>
+
+        <div style="font-weight: bold; margin-bottom: 80px">Wali Kelas</div>
+
+        <div style="font-weight: bold">
+          <%= typeof wali_kelas !== 'undefined' ? wali_kelas : '-' %>
+        </div>
+
+        <div style="margin-top: 5px; font-size: 10pt">NIP. <%= guru.nip || '-' %></div>
+      </td>
+    </tr>
+  </table>
+</div>

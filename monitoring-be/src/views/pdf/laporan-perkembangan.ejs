@@ -1,32 +1,46 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Laporan Perkembangan - <%= siswa.nama %></title>
-  
-  <style>
-    <%- include('styles/pdf-styles') %>
-  </style>
-  
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Laporan Perkembangan - <%= siswa.nama %></title>
 
-  <%- include('partials/student-info', { siswa: siswa, tahunAjaran: tahunAjaran }) %>
+    <style>
+      <%- cssContent %>
+    </style>
+  </head>
+  <body>
+    <!-- Header Universal -->
+    <%- include('partials/header') %>
 
-  <%- include('partials/academic-grades', { nilai_akademik: nilai_akademik }) %>
+    <!-- Student Info - Role Specific Layout -->
+    <%- include('partials/student-info-dynamic', { role: typeof role !== 'undefined' ? role :
+    'guru', siswa: siswa, tahunAjaran: typeof tahunAjaran !== 'undefined' ? tahunAjaran : '',
+    semester: typeof semester !== 'undefined' ? semester : '', kelas: typeof kelas !== 'undefined' ?
+    kelas : '', wali_kelas: typeof wali_kelas !== 'undefined' ? wali_kelas : '', ortu_nama: typeof
+    ortu_nama !== 'undefined' ? ortu_nama : '' }) %>
 
-  <%- include('partials/notes', { catatan_perkembangan: catatan_perkembangan }) %>
+    <!-- Semester Info - Admin Only -->
+    <% if (role === 'admin') { %> <%- include('partials/semester-info', { tahunAjaran: tahunAjaran,
+    semester: semester, kelas: kelas }) %> <% } %>
 
-  <div class="section">
-    <h3>CATATAN WALI KELAS</h3>
-    <p class="catatan-text">
-      <%= catatan_wali_kelas %>
-    </p>
-  </div>
+    <!-- Nilai Table - Universal -->
+    <%- include('partials/nilai-table', { nilai_akademik: nilai_akademik }) %>
 
-  <%- include('partials/attendance', { absensi: absensi }) %>
+    <!-- Catatan Perkembangan - Guru & Ortu Only -->
+    <%- include('partials/catatan-perkembangan', { role: typeof role !== 'undefined' ? role :
+    'guru', catatan_perkembangan: typeof catatan_perkembangan !== 'undefined' ? catatan_perkembangan
+    : [] }) %>
 
-  <%- include('partials/footer', { guru: guru, tanggal_cetak: tanggal_cetak }) %>
+    <!-- Catatan Wali Kelas - Guru Only -->
+    <%- include('partials/catatan-wali-kelas', { role: typeof role !== 'undefined' ? role : 'guru',
+    catatan_wali_kelas: typeof catatan_wali_kelas !== 'undefined' ? catatan_wali_kelas : '' }) %>
 
-</body>
+    <!-- Rekapitulasi Absensi - All Roles -->
+    <%- include('partials/absensi-rekapitulasi', { absensi: typeof absensi !== 'undefined' ? absensi
+    : {} }) %>
+
+    <!-- Footer - Role Specific Signatures -->
+    <%- include('partials/footer', { guru: typeof guru !== 'undefined' ? guru : {}, tanggal_cetak:
+    tanggal_cetak, role: typeof role !== 'undefined' ? role : 'guru' }) %>
+  </body>
 </html>

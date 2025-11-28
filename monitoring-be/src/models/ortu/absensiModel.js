@@ -2,19 +2,14 @@ import db from '../../config/db.js'
 
 /**
  * Get tahun ajaran yang relevan untuk siswa
- * Menampilkan tahun ajaran aktif + history (dimana siswa pernah punya data absensi)
+ * Menampilkan tahun ajaran UNIQUE (tanpa duplikat semester)
  * Sort DESC (terbaru di atas)
  */
 export const getTahunAjaranBySiswa = (siswaId) => {
   return new Promise((resolve, reject) => {
     const query = `
       SELECT DISTINCT
-        ta.id,
-        ta.tahun,
-        ta.semester,
-        ta.status,
-        ta.tanggal_mulai,
-        ta.tanggal_selesai
+        ta.tahun
       FROM tahun_ajaran ta
       WHERE ta.status = 'aktif'
         OR EXISTS (
@@ -24,7 +19,7 @@ export const getTahunAjaranBySiswa = (siswaId) => {
             AND a.tanggal >= ta.tanggal_mulai
             AND a.tanggal <= ta.tanggal_selesai
         )
-      ORDER BY ta.tanggal_mulai DESC
+      ORDER BY ta.tahun DESC
     `
 
     db.query(query, [siswaId], (error, results) => {
@@ -39,8 +34,9 @@ export const getTahunAjaranBySiswa = (siswaId) => {
 /**
  * Get semester berdasarkan tahun ajaran yang dipilih
  * Menampilkan semester dengan info apakah siswa punya data absensi di semester tersebut
+ * Filter by tahun (string), bukan ID
  */
-export const getSemesterByTahunAjaran = (siswaId, tahunAjaranId) => {
+export const getSemesterByTahunAjaran = (siswaId, tahunAjaran) => {
   return new Promise((resolve, reject) => {
     const query = `
       SELECT 
@@ -55,11 +51,17 @@ export const getSemesterByTahunAjaran = (siswaId, tahunAjaranId) => {
         AND a.tanggal >= ta.tanggal_mulai
         AND a.tanggal <= ta.tanggal_selesai
       )
-      WHERE ta.id = ?
+      WHERE ta.tahun = ?
       GROUP BY ta.id, ta.semester, ta.tanggal_mulai, ta.tanggal_selesai
+      ORDER BY 
+        CASE 
+          WHEN ta.semester = 'Ganjil' THEN 1
+          WHEN ta.semester = 'Genap' THEN 2
+          ELSE 3
+        END ASC
     `
 
-    db.query(query, [siswaId, tahunAjaranId], (error, results) => {
+    db.query(query, [siswaId, tahunAjaran], (error, results) => {
       if (error) {
         return reject(error)
       }

@@ -2,7 +2,7 @@ import absensiModel from '../../models/ortu/absensiModel.js'
 
 /**
  * Get daftar tahun ajaran yang relevan untuk orang tua
- * Menampilkan tahun ajaran aktif + tahun ajaran dimana siswa pernah absen
+ * Menampilkan tahun ajaran UNIQUE (tanpa duplikat semester)
  */
 export const getTahunAjaranService = async (siswaId) => {
   try {
@@ -18,14 +18,9 @@ export const getTahunAjaranService = async (siswaId) => {
       return []
     }
 
-    // Format response
+    // Format response - hanya tahun string
     const formattedData = tahunAjaranList.map((item) => ({
-      id: item.id,
       tahun: item.tahun,
-      semester: item.semester,
-      status: item.status,
-      tanggal_mulai: item.tanggal_mulai,
-      tanggal_selesai: item.tanggal_selesai,
     }))
 
     return formattedData
@@ -38,19 +33,21 @@ export const getTahunAjaranService = async (siswaId) => {
 /**
  * Get daftar semester berdasarkan tahun ajaran yang dipilih
  * Menampilkan semester dengan info status aktif dan has_data (punya riwayat absensi)
+ * Filter by tahun (string), bukan ID
+ * Hanya tampilkan semester yang ada datanya
  */
-export const getSemesterService = async (siswaId, tahunAjaranId) => {
+export const getSemesterService = async (siswaId, tahunAjaran) => {
   try {
     // Validation
     if (!siswaId) {
       throw new Error('Siswa ID tidak ditemukan')
     }
-    if (!tahunAjaranId) {
-      throw new Error('Tahun ajaran ID tidak ditemukan')
+    if (!tahunAjaran) {
+      throw new Error('Tahun ajaran tidak ditemukan')
     }
 
     // Get semester list dari model
-    const semesterList = await absensiModel.getSemesterByTahunAjaran(siswaId, tahunAjaranId)
+    const semesterList = await absensiModel.getSemesterByTahunAjaran(siswaId, tahunAjaran)
 
     if (!semesterList || semesterList.length === 0) {
       return []
@@ -59,26 +56,29 @@ export const getSemesterService = async (siswaId, tahunAjaranId) => {
     // Get tanggal sekarang untuk menentukan semester aktif
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
 
-    // Format response
-    const formattedData = semesterList.map((item) => {
-      // Cek apakah semester aktif (tanggal sekarang dalam range)
-      const isAktif =
-        today >= item.tanggal_mulai && today <= item.tanggal_selesai ? 'aktif' : 'tidak-aktif'
+    // Format response dan filter hanya yang has_data
+    const formattedData = semesterList
+      .filter((item) => item.has_data > 0) // HANYA SEMESTER YANG PUNYA DATA
+      .map((item) => {
+        // Cek apakah semester aktif (tanggal sekarang dalam range)
+        const isAktif =
+          today >= item.tanggal_mulai && today <= item.tanggal_selesai ? 'aktif' : 'tidak-aktif'
 
-      // Nama semester berdasarkan enum
-      const namaSemester = item.semester === 'Ganjil' ? 'Semester 1 (Ganjil)' : 'Semester 2 (Genap)'
-      const valueSemester = item.semester === 'Ganjil' ? '1' : '2'
+        // Nama semester berdasarkan enum
+        const namaSemester =
+          item.semester === 'Ganjil' ? 'Semester 1 (Ganjil)' : 'Semester 2 (Genap)'
+        const valueSemester = item.semester === 'Ganjil' ? '1' : '2'
 
-      return {
-        id: item.id,
-        nama: namaSemester,
-        value: valueSemester,
-        status: isAktif,
-        tanggal_mulai: item.tanggal_mulai,
-        tanggal_selesai: item.tanggal_selesai,
-        has_data: item.has_data > 0, // Convert count to boolean
-      }
-    })
+        return {
+          id: item.id,
+          nama: namaSemester,
+          value: valueSemester,
+          status: isAktif,
+          tanggal_mulai: item.tanggal_mulai,
+          tanggal_selesai: item.tanggal_selesai,
+          has_data: true, // Pasti true karena sudah difilter
+        }
+      })
 
     return formattedData
   } catch (error) {

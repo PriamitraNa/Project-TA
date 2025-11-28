@@ -2,22 +2,18 @@ import db from '../../config/db.js'
 
 /**
  * Get tahun ajaran yang ada data nilai siswa
- * CRITICAL: Hanya tampilkan tahun ajaran dimana siswa memiliki data kelas_siswa
+ * Return UNIQUE tahun (tanpa duplikat semester)
  */
 export const getTahunAjaranListBySiswa = (siswaId) => {
   return new Promise((resolve, reject) => {
     const query = `
       SELECT DISTINCT
-        ta.id,
         ta.tahun AS tahun_ajaran,
-        CASE 
-          WHEN ta.status = 'aktif' THEN CONCAT(ta.tahun, ' (Aktif)')
-          ELSE ta.tahun
-        END AS label,
-        ta.status = 'aktif' AS is_active
+        MAX(CASE WHEN ta.status = 'aktif' THEN 1 ELSE 0 END) AS is_active
       FROM tahun_ajaran ta
       JOIN kelas_siswa ks ON ta.id = ks.tahun_ajaran_id
       WHERE ks.siswa_id = ?
+      GROUP BY ta.tahun
       ORDER BY ta.tahun DESC
     `
 
@@ -32,21 +28,22 @@ export const getTahunAjaranListBySiswa = (siswaId) => {
 
 /**
  * Get semester yang ada data nilai untuk siswa dan tahun ajaran tertentu
- * CRITICAL: Hanya tampilkan semester yang memiliki data nilai
- * Note: Database menggunakan ENUM('Ganjil','Genap') bukan '1'/'2'
+ * Filter by tahun (string), return id + semester
  */
-export const getSemesterListBySiswa = (siswaId, tahunAjaranId) => {
+export const getSemesterListBySiswa = (siswaId, tahunAjaran) => {
   return new Promise((resolve, reject) => {
     const query = `
       SELECT DISTINCT
+        ta.id AS tahun_ajaran_id,
         n.semester,
         CASE 
           WHEN n.semester = 'Ganjil' THEN 'Semester 1 (Ganjil)'
           WHEN n.semester = 'Genap' THEN 'Semester 2 (Genap)'
         END AS label
       FROM nilai n
+      JOIN tahun_ajaran ta ON n.tahun_ajaran_id = ta.id
       WHERE n.siswa_id = ?
-        AND n.tahun_ajaran_id = ?
+        AND ta.tahun = ?
       ORDER BY 
         CASE 
           WHEN n.semester = 'Ganjil' THEN 1
@@ -54,7 +51,7 @@ export const getSemesterListBySiswa = (siswaId, tahunAjaranId) => {
         END ASC
     `
 
-    db.query(query, [siswaId, tahunAjaranId], (error, results) => {
+    db.query(query, [siswaId, tahunAjaran], (error, results) => {
       if (error) {
         return reject(error)
       }
@@ -90,6 +87,7 @@ export const getNilaiBySiswaId = (siswaId, tahunAjaranId, semester) => {
         n.lm5_tp1, n.lm5_tp2, n.lm5_tp3, n.lm5_tp4,
         n.lm1_ulangan, n.lm2_ulangan, n.lm3_ulangan, n.lm4_ulangan, n.lm5_ulangan,
         n.uts, n.uas,
+        n.nilai_akhir,
         
         -- Guru Info (from kelas_mapel relationship)
         u.nama_lengkap AS guru_nama,
@@ -176,9 +174,105 @@ export const getStatistikNilai = (siswaId, tahunAjaranId, semester) => {
   })
 }
 
+/**
+ * Get guru wali kelas by siswa
+ */
+export const getGuruWaliKelasBySiswa = (siswaId) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        u.nama_lengkap AS nama,
+        g.nip
+      FROM siswa s
+      JOIN kelas_siswa ks ON s.id = ks.siswa_id
+      JOIN kelas k ON ks.kelas_id = k.id
+      JOIN guru g ON k.wali_kelas_id = g.id
+      JOIN users u ON g.user_id = u.id
+      WHERE s.id = ?
+      LIMIT 1
+    `
+
+    db.query(query, [siswaId], (error, results) => {
+      if (error) {
+        return reject(error)
+      }
+      resolve(results[0] || null)
+    })
+  })
+}
+
+/**
+ * Get catatan perkembangan siswa by semester
+ */
+export const getCatatanPerkembanganBySiswa = (siswaId, tahunAjaranId, semester) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        ch.id,
+        ch.created_at AS tanggal,
+        (
+          SELECT cd.pesan 
+          FROM catatan_detail cd 
+          WHERE cd.header_id = ch.id 
+          ORDER BY cd.created_at ASC 
+          LIMIT 1
+        ) AS isi_catatan,
+        u.nama_lengkap AS guru_nama,
+        ch.kategori,
+        ch.jenis
+      FROM catatan_header ch
+      JOIN guru g ON ch.guru_id = g.id
+      JOIN users u ON g.user_id = u.id
+      WHERE ch.siswa_id = ?
+      ORDER BY ch.created_at DESC
+    `
+
+    db.query(query, [siswaId], (error, results) => {
+      if (error) {
+        return reject(error)
+      }
+      resolve(results)
+    })
+  })
+}
+
+/**
+ * Get rekapitulasi absensi siswa by semester
+ */
+export const getRekapAbsensiBySiswa = (siswaId, tahunAjaranId, semester) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        COUNT(CASE WHEN status = 'Hadir' THEN 1 END) AS hadir,
+        COUNT(CASE WHEN status = 'Sakit' THEN 1 END) AS sakit,
+        COUNT(CASE WHEN status = 'Izin' THEN 1 END) AS izin,
+        COUNT(CASE WHEN status = 'Alpha' THEN 1 END) AS alpha
+      FROM absensi
+      WHERE siswa_id = ?
+        AND kelas_id = (
+          SELECT ks.kelas_id 
+          FROM kelas_siswa ks 
+          WHERE ks.siswa_id = ? 
+            AND ks.tahun_ajaran_id = ?
+          LIMIT 1
+        )
+    `
+
+    db.query(query, [siswaId, siswaId, tahunAjaranId], (error, results) => {
+      if (error) {
+        return reject(error)
+      }
+      resolve(results[0] || { hadir: 0, sakit: 0, izin: 0, alpha: 0 })
+    })
+  })
+}
+
 export default {
   getTahunAjaranListBySiswa,
   getSemesterListBySiswa,
   getNilaiBySiswaId,
   getStatistikNilai,
+  getGuruWaliKelasBySiswa,
+  getCatatanPerkembanganBySiswa,
+  getRekapAbsensiBySiswa,
 }

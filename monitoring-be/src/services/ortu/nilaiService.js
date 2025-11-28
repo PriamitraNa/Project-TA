@@ -2,7 +2,7 @@ import nilaiModel from '../../models/ortu/nilaiModel.js'
 
 /**
  * Get daftar tahun ajaran yang pernah diikuti siswa
- * Auto-select tahun ajaran pertama (terbaru)
+ * Return UNIQUE tahun saja (misal: ['2025/2026', '2024/2025'])
  */
 export const getTahunAjaranService = async (siswaId) => {
   try {
@@ -16,9 +16,8 @@ export const getTahunAjaranService = async (siswaId) => {
       return []
     }
 
-    // Format response
+    // Format response - hanya tahun ajaran string
     const formattedData = tahunAjaranList.map((item) => ({
-      tahun_ajaran_id: item.tahun_ajaran_id,
       tahun_ajaran: item.tahun_ajaran,
     }))
 
@@ -33,27 +32,29 @@ export const getTahunAjaranService = async (siswaId) => {
  * Get daftar semester berdasarkan tahun ajaran untuk siswa
  * Semester yang pernah diikuti siswa di tahun ajaran tertentu
  * Order by ASC (Ganjil dulu, baru Genap)
+ * Return semester beserta tahun_ajaran_id untuk fetch nilai
  */
-export const getSemesterService = async (siswaId, tahunAjaranId) => {
+export const getSemesterService = async (siswaId, tahunAjaran) => {
   try {
     // Validation
     if (!siswaId) {
       throw new Error('Siswa ID tidak ditemukan')
     }
 
-    if (!tahunAjaranId || isNaN(tahunAjaranId)) {
-      throw new Error('Tahun ajaran ID tidak valid')
+    if (!tahunAjaran) {
+      throw new Error('Tahun ajaran tidak valid')
     }
 
     // Get semester dari model
-    const semesterList = await nilaiModel.getSemesterBySiswaAndTahun(siswaId, tahunAjaranId)
+    const semesterList = await nilaiModel.getSemesterBySiswaAndTahun(siswaId, tahunAjaran)
 
     if (!semesterList || semesterList.length === 0) {
       return []
     }
 
-    // Format response - hanya ambil field semester
+    // Format response - semester + tahun_ajaran_id
     const formattedData = semesterList.map((item) => ({
+      tahun_ajaran_id: item.tahun_ajaran_id,
       semester: item.semester,
     }))
 
@@ -124,9 +125,9 @@ export const getNilaiDetailService = async (siswaId, tahunAjaranId, semester) =>
         lm5_ulangan: item.lm5_ulangan,
         uts: item.uts,
         uas: item.uas,
-        nilai_akhir: item.nilai_akhir  // ← Use stored nilai_akhir from DB
-      };
-    });
+        nilai_akhir: item.nilai_akhir, // ← Use stored nilai_akhir from DB
+      }
+    })
 
     return formattedNilai
   } catch (error) {

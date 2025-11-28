@@ -1,0 +1,9 @@
+<!-- Semester Info Section: Hanya untuk Role Admin -->
+<% if (role === 'admin' && typeof semesterInfo !== 'undefined') { %>
+<div class="semester-info-section">
+  <div class="semester-header">
+    <%= semesterInfo.tahun %> - Semester <%= semesterInfo.semester %>
+  </div>
+  <div class="semester-kelas">Kelas: <%= semesterInfo.kelas %></div>
+</div>
+<% } %>

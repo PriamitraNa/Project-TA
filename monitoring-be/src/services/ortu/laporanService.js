@@ -1,5 +1,13 @@
 import * as laporanModel from '../../models/ortu/laporanModel.js'
-import PDFDocument from 'pdfkit'
+import puppeteer from 'puppeteer'
+import ejs from 'ejs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import fs from 'fs'
+
+// Helper untuk mendapatkan __dirname di ES Modules
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 /**
  * Helper function untuk menghitung nilai_akhir dari satu mapel
@@ -71,15 +79,14 @@ const calculateNilaiAkhir = (row) => {
 
 /**
  * Get list tahun ajaran untuk dropdown (hanya yang ada data nilai siswa)
+ * Return UNIQUE tahun saja
  */
 export const getTahunAjaranService = async (siswaId) => {
   try {
     const tahunAjaranList = await laporanModel.getTahunAjaranListBySiswa(siswaId)
 
     return tahunAjaranList.map((ta) => ({
-      id: ta.id,
       tahun_ajaran: ta.tahun_ajaran,
-      label: ta.label,
       is_active: ta.is_active === 1 || ta.is_active === true,
     }))
   } catch (error) {
@@ -90,19 +97,20 @@ export const getTahunAjaranService = async (siswaId) => {
 
 /**
  * Get list semester untuk dropdown (hanya yang ada data nilai)
+ * Filter by tahun ajaran (string)
  */
-export const getSemesterService = async (siswaId, tahunAjaranId) => {
+export const getSemesterService = async (siswaId, tahunAjaran) => {
   try {
     // Validation
     if (!siswaId) {
       throw new Error('Data siswa tidak ditemukan dalam token')
     }
 
-    if (!tahunAjaranId) {
+    if (!tahunAjaran) {
       throw new Error('Tahun ajaran wajib dipilih')
     }
 
-    const semesterList = await laporanModel.getSemesterListBySiswa(siswaId, tahunAjaranId)
+    const semesterList = await laporanModel.getSemesterListBySiswa(siswaId, tahunAjaran)
 
     // Map dan konversi Ganjil/Genap ke format 1/2 untuk frontend
     return semesterList.map((sem) => {
@@ -115,6 +123,7 @@ export const getSemesterService = async (siswaId, tahunAjaranId) => {
       }
 
       return {
+        tahun_ajaran_id: sem.tahun_ajaran_id, // ID untuk fetch laporan
         semester: semesterValue, // '1' atau '2' untuk frontend
         label: sem.label, // "Semester 1 (Ganjil)" atau "Semester 2 (Genap)"
       }
@@ -179,18 +188,22 @@ export const getNilaiLaporanService = async (siswaId, tahunAjaranId, semester) =
 
     // Format nilai array - Show ALL mapel (even if nilai is empty)
     const nilaiArray = nilaiData.map((row) => {
-      // Calculate nilai_akhir (will be 0 if no grades)
-      const nilaiAkhir = calculateNilaiAkhir(row)
+      // Use nilai_akhir from database (calculated by trigger)
+      const nilaiAkhir =
+        row.nilai_akhir !== null && row.nilai_akhir !== undefined ? row.nilai_akhir : null
+
       return {
         nilai_id: row.nilai_id, // Might be null if no grades
         nama_mapel: row.nama_mapel,
-        nilai_akhir: nilaiAkhir, // 0 if no grades
+        nilai_akhir: nilaiAkhir, // null if no grades, otherwise from DB
         guru_nama: row.guru_nama,
       }
     })
 
-    // Calculate statistik only from mapel that have grades (nilai_akhir > 0)
-    const nilaiAkhirValues = nilaiArray.map((n) => n.nilai_akhir).filter((v) => v > 0)
+    // Calculate statistik only from mapel that have grades (nilai_akhir not null)
+    const nilaiAkhirValues = nilaiArray
+      .map((n) => n.nilai_akhir)
+      .filter((v) => v !== null && v !== undefined && v > 0)
 
     const calculatedStatistik = {
       total_mapel: nilaiArray.length, // All mapel in class
@@ -209,6 +222,8 @@ export const getNilaiLaporanService = async (siswaId, tahunAjaranId, semester) =
       siswa: siswaInfo,
       nilai: nilaiArray,
       statistik: calculatedStatistik,
+      catatan_perkembangan: [], // Will be populated in PDF generation
+      absensi: {}, // Will be populated in PDF generation
     }
   } catch (error) {
     console.error('Error in getNilaiLaporanService:', error)
@@ -217,227 +232,201 @@ export const getNilaiLaporanService = async (siswaId, tahunAjaranId, semester) =
 }
 
 /**
- * Generate PDF laporan nilai untuk ortu
+ * Generate PDF laporan nilai untuk ortu menggunakan Puppeteer + EJS
  */
 export const generatePDFLaporanService = async (siswaId, tahunAjaranId, semester) => {
+  let browser
+
   try {
+    // Validation & normalize semester
+    if (!semester) {
+      throw new Error('Semester wajib diisi')
+    }
+    let normalizedSemester = semester
+    if (semester === '1' || semester === 1) {
+      normalizedSemester = 'Ganjil'
+    } else if (semester === '2' || semester === 2) {
+      normalizedSemester = 'Genap'
+    }
+
     // Reuse logic from getNilaiLaporanService to get data
     const laporanData = await getNilaiLaporanService(siswaId, tahunAjaranId, semester)
 
-    // Create PDF document
-    const doc = new PDFDocument({
-      size: 'A4',
-      layout: 'portrait',
-      margins: { top: 50, bottom: 50, left: 50, right: 50 },
-    })
+    // Get additional data for PDF
+    const guruWaliKelas = await laporanModel.getGuruWaliKelasBySiswa(siswaId)
+    console.log('DEBUG guruWaliKelas:', guruWaliKelas)
 
-    // School info
-    const schoolName = 'SDN 1 Langensari'
-    const schoolAddress =
-      'Jl. Cipanas, Kp. Korobokan, Cimanganten, Kec. Tarogong Kaler, Kabupaten Garut, Jawa Barat 44151'
+    const catatanPerkembangan = await laporanModel.getCatatanPerkembanganBySiswa(
+      siswaId,
+      tahunAjaranId,
+      normalizedSemester
+    )
+    const absensi = await laporanModel.getRekapAbsensiBySiswa(
+      siswaId,
+      tahunAjaranId,
+      normalizedSemester
+    )
 
-    // Logo path
-    const logoPath = 'assets/logo-sekolah.png'
+    // Get siswa detail
+    const siswaDetail = laporanData.siswa
+    console.log('DEBUG siswaDetail:', siswaDetail)
 
-    // Header with logo
-    const headerY = 50
-    const pageWidth = 595 // A4 portrait width in points
-
-    // Logo (left side)
+    // Konversi logo ke Base64
+    let logoBase64 = ''
     try {
-      doc.image(logoPath, 50, headerY, { width: 60, height: 60 })
-    } catch (err) {
-      console.warn('Logo not found, skipping logo:', err.message)
+      const logoPath = path.join(process.cwd(), 'assets', 'logo-sekolah.png')
+      logoBase64 = fs.readFileSync(logoPath).toString('base64')
+    } catch (e) {
+      console.warn('Logo tidak ditemukan, menggunakan placeholder.')
     }
 
-    // School name (center, offset for logo)
-    doc.fontSize(16).font('Times-Bold')
-    doc.text(schoolName, 120, headerY + 10, { align: 'center', width: pageWidth - 170 })
+    // Siapkan data untuk template
+    const templateData = {
+      role: 'ortu',
+      siswa: {
+        nama: siswaDetail.siswa_nama,
+        nisn: siswaDetail.nisn,
+        kelas_nama: siswaDetail.kelas_nama,
+      },
+      kelas: siswaDetail.kelas_nama,
+      wali_kelas: guruWaliKelas ? guruWaliKelas.nama : '-',
+      tahunAjaran: siswaDetail.tahun_ajaran,
+      semester: siswaDetail.semester,
+      nilai_akademik: laporanData.nilai.map((nilai) => ({
+        nama_mapel: nilai.nama_mapel,
+        nilai_akhir: nilai.nilai_akhir !== null ? parseFloat(nilai.nilai_akhir) : null,
+        grade: nilai.nilai_akhir ? getGrade(nilai.nilai_akhir) : '-',
+        guru_nama: nilai.guru_nama || '-',
+      })),
+      catatan_perkembangan: catatanPerkembangan.map((catatan) => {
+        const tanggalObj = new Date(catatan.tanggal)
+        const tanggalFormatted = !isNaN(tanggalObj.getTime())
+          ? tanggalObj.toLocaleDateString('id-ID', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            })
+          : catatan.tanggal.split('T')[0].split('-').reverse().join('/')
 
-    // School address (center, below name)
-    doc.fontSize(8).font('Times-Roman')
-    doc.text(schoolAddress, 120, headerY + 32, { align: 'center', width: pageWidth - 170 })
-
-    doc.moveDown(1.5)
-
-    // Horizontal line below header
-    doc.moveDown(0.5)
-    const titleLineY = doc.y
-    doc
-      .moveTo(50, titleLineY)
-      .lineTo(pageWidth - 50, titleLineY)
-      .stroke()
-
-    doc.moveDown(2)
-
-    // Title
-    doc.fontSize(14).font('Times-Bold')
-    doc.text('LAPORAN NILAI SISWA', { align: 'center' })
-    doc.moveDown(0.3)
-    doc.fontSize(10).font('Times-Roman')
-    doc.text(`${laporanData.siswa.tahun_ajaran} - Semester ${laporanData.siswa.semester}`, {
-      align: 'center',
-    })
-
-    doc.moveDown(1)
-
-    // Student info (left aligned, stacked, rapi dengan tab)
-    const infoY = doc.y
-    const labelWidth = 110 // Fixed width untuk label
-
-    doc.fontSize(10).font('Times-Roman')
-    doc.text('Nama Siswa', 50, infoY)
-    doc.text(': ' + laporanData.siswa.siswa_nama, 50 + labelWidth, infoY)
-
-    doc.text('NISN', 50, infoY + 15)
-    doc.text(': ' + laporanData.siswa.nisn, 50 + labelWidth, infoY + 15)
-
-    doc.text('Kelas', 50, infoY + 30)
-    doc.text(': ' + laporanData.siswa.kelas_nama, 50 + labelWidth, infoY + 30)
-
-    doc.moveDown(3)
-
-    // Table header
-    const tableTop = doc.y
-    const rowHeight = 22
-    const headerHeight = 22
-    const colWidths = {
-      no: 30,
-      mapel: 200,
-      nilaiAkhir: 80,
-      guru: 150,
-    }
-
-    let xPos = 50
-
-    // Calculate total table width
-    const totalWidth = colWidths.no + colWidths.mapel + colWidths.nilaiAkhir + colWidths.guru
-
-    // Draw table header with gray background
-    doc.fontSize(8).font('Times-Bold')
-
-    // Header background
-    doc.fillColor('#E8E8E8')
-    doc.rect(xPos, tableTop, totalWidth, headerHeight).fill()
-    doc.fillColor('#000000')
-
-    // No
-    doc.rect(xPos, tableTop, colWidths.no, headerHeight).stroke()
-    doc.text('No', xPos + 5, tableTop + 8, { width: colWidths.no - 10, align: 'center' })
-    xPos += colWidths.no
-
-    // Mata Pelajaran
-    doc.rect(xPos, tableTop, colWidths.mapel, headerHeight).stroke()
-    doc.text('Mata Pelajaran', xPos + 5, tableTop + 8, {
-      width: colWidths.mapel - 10,
-      align: 'center',
-    })
-    xPos += colWidths.mapel
-
-    // Nilai Akhir
-    doc.rect(xPos, tableTop, colWidths.nilaiAkhir, headerHeight).stroke()
-    doc.text('Nilai Akhir', xPos + 5, tableTop + 8, {
-      width: colWidths.nilaiAkhir - 10,
-      align: 'center',
-    })
-    xPos += colWidths.nilaiAkhir
-
-    // Guru
-    doc.rect(xPos, tableTop, colWidths.guru, headerHeight).stroke()
-    doc.text('Guru', xPos + 5, tableTop + 8, { width: colWidths.guru - 10, align: 'center' })
-
-    // Draw table rows
-    doc.font('Times-Roman')
-    doc.fontSize(8)
-    let yPos = tableTop + headerHeight
-
-    laporanData.nilai.forEach((nilai, index) => {
-      // Check if need new page
-      if (yPos > 720) {
-        doc.addPage()
-        yPos = 50
-      }
-
-      xPos = 50
-
-      // No
-      doc.rect(xPos, yPos, colWidths.no, rowHeight).stroke()
-      doc.text((index + 1).toString(), xPos + 5, yPos + 8, {
-        width: colWidths.no - 10,
-        align: 'center',
-      })
-      xPos += colWidths.no
-
-      // Mata Pelajaran
-      doc.rect(xPos, yPos, colWidths.mapel, rowHeight).stroke()
-      doc.text(nilai.nama_mapel || '-', xPos + 5, yPos + 8, { width: colWidths.mapel - 10 })
-      xPos += colWidths.mapel
-
-      // Nilai Akhir
-      doc.rect(xPos, yPos, colWidths.nilaiAkhir, rowHeight).stroke()
-      doc.text(
-        nilai.nilai_akhir !== null ? nilai.nilai_akhir.toString() : '-',
-        xPos + 5,
-        yPos + 8,
-        {
-          width: colWidths.nilaiAkhir - 10,
-          align: 'center',
+        return {
+          tanggal: catatan.tanggal,
+          tanggal_formatted: tanggalFormatted,
+          guru_nama: catatan.guru_nama,
+          isi_catatan: catatan.isi_catatan,
         }
-      )
-      xPos += colWidths.nilaiAkhir
+      }),
+      absensi: {
+        hadir: parseInt(absensi.hadir) || 0,
+        sakit: parseInt(absensi.sakit) || 0,
+        izin: parseInt(absensi.izin) || 0,
+        alpha: parseInt(absensi.alpha) || 0,
+      },
+      guru: guruWaliKelas || {},
+      tanggal_cetak: new Date().toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+      logoBase64: logoBase64,
+    }
 
-      // Guru
-      doc.rect(xPos, yPos, colWidths.guru, rowHeight).stroke()
-      doc.text(nilai.guru_nama || '-', xPos + 5, yPos + 8, {
-        width: colWidths.guru - 10,
-        align: 'center',
-      })
+    // Render HTML dari template EJS
+    const templatePath = path.join(__dirname, '../../views/pdf/laporan-perkembangan.ejs')
+    const cssPath = path.join(__dirname, '../../views/pdf/styles/pdf-laporan.css')
+    const cssContent = fs.readFileSync(cssPath, 'utf-8')
 
-      yPos += rowHeight
+    // Add CSS content to template data
+    templateData.cssContent = cssContent
+
+    const htmlContent = await ejs.renderFile(templatePath, templateData)
+
+    // Header Template (Kop Surat)
+    const headerTemplate = `
+    <style>
+        body { font-family: 'Times New Roman', serif; font-size: 10pt; width: 100%; margin: 0; padding: 0; }
+        .kop-surat { 
+          display: flex; 
+          align-items: center; 
+          border-bottom: 3px solid black; 
+          padding: 10px 40px;
+          margin: 0;
+        }
+        .kop-surat img.logo { width: 70px; height: 70px; margin-right: 20px; }
+        .kop-surat .teks-kop { text-align: center; flex-grow: 1; line-height: 1.3; }
+        .kop-surat h2 { font-size: 16pt; margin: 0; font-weight: bold; }
+        .kop-surat h3 { font-size: 14pt; margin: 0; font-weight: bold; }
+        .kop-surat p { font-size: 9pt; margin: 0; }
+      </style>
+      
+      <div class="kop-surat">
+        <img src="data:image/png;base64,${logoBase64}" alt="Logo" class="logo">
+        <div class="teks-kop">
+          <h2>LAPORAN PERKEMBANGAN SISWA</h2>
+          <h3>SDN 1 LANGENSARI</h3>
+          <p>Jl. Cipanas, Kp. Korobokan, Cimanganten, Kec. Tarogong Kaler, Kabupaten Garut, Jawa Barat 44151</p>
+        </div>
+      </div>
+    `
+
+    // Footer Template (Nomor Halaman)
+    const footerTemplate = `
+      <style>
+        div { 
+          font-family: 'Times New Roman', serif; 
+          font-size: 9pt; 
+          width: 100%; 
+          text-align: right; 
+          padding: 0 40px;
+          box-sizing: border-box;
+        }
+      </style>
+      <div>
+        Halaman <span class="pageNumber"></span> dari <span class="totalPages"></span>
+      </div>
+    `
+
+    // Launch Puppeteer
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
 
-    // Statistik section
-    doc.moveDown(2)
-    const statY = doc.y
+    const page = await browser.newPage()
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
 
-    doc.fontSize(10).font('Times-Bold')
-    doc.text('Statistik Nilai:', 50, statY)
-
-    doc.fontSize(9).font('Times-Roman')
-    doc.text(`Rata-rata: ${laporanData.statistik.rata_rata}`, 50, statY + 20)
-    doc.text(`Nilai Tertinggi: ${laporanData.statistik.nilai_tertinggi}`, 50, statY + 35)
-    doc.text(`Nilai Terendah: ${laporanData.statistik.nilai_terendah}`, 50, statY + 50)
-    doc.text(
-      `Tuntas: ${laporanData.statistik.tuntas} / ${laporanData.statistik.total_mapel}`,
-      50,
-      statY + 65
-    )
-    doc.text(
-      `Belum Tuntas: ${laporanData.statistik.belum_tuntas} / ${laporanData.statistik.total_mapel}`,
-      50,
-      statY + 80
-    )
-
-    // Footer - Tanggal cetak
-    doc.moveDown(3)
-    const footerY = doc.y
-
-    // Tanggal cetak (right aligned)
-    doc.fontSize(10).font('Times-Roman')
-    const currentDate = new Date()
-    const dateStr = currentDate.toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
+    // Generate PDF dengan header & footer
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      displayHeaderFooter: true,
+      headerTemplate: headerTemplate,
+      footerTemplate: footerTemplate,
+      margin: {
+        top: '140px',
+        bottom: '60px',
+        left: '40px',
+        right: '40px',
+      },
     })
 
-    doc.text(`Dicetak pada: ${dateStr}`, 380, footerY, { align: 'right' })
-
-    return doc
+    await browser.close()
+    return pdfBuffer
   } catch (error) {
     console.error('Error in generatePDFLaporanService:', error)
+    if (browser) await browser.close()
     throw error
   }
+}
+
+/**
+ * Helper function to convert nilai_akhir to grade
+ */
+const getGrade = (nilaiAkhir) => {
+  if (nilaiAkhir >= 90) return 'A'
+  if (nilaiAkhir >= 80) return 'B'
+  if (nilaiAkhir >= 70) return 'C'
+  if (nilaiAkhir >= 60) return 'D'
+  return 'E'
 }
 
 export default {

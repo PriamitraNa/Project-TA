@@ -1,0 +1,543 @@
+/* ====================================================================
+   PENTING! 
+   File ini TIDAK BOLEH berisi @page { margin: 0; } atau body { margin: 0; }
+   Biarkan body bersih agar "patuh" pada margin Puppeteer.
+   ==================================================================== */
+
+/* ==================== BASE STYLES ==================== */
+body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 11pt;
+  line-height: 1.6;
+  color: #000;
+}
+
+/* ==================== SECTION STYLES ==================== */
+.section {
+  margin-bottom: 20px;
+  page-break-inside: avoid;
+}
+
+.section h3 {
+  font-size: 12pt;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #333;
+}
+
+/* ==================== STUDENT INFO STYLES ==================== */
+.info-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 30px;
+  margin-bottom: 20px;
+  page-break-inside: avoid;
+}
+
+.info-grid-2col .info-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-single-col {
+  margin-bottom: 20px;
+  page-break-inside: avoid;
+}
+
+.student-info-section {
+  margin-bottom: 20px;
+  page-break-inside: avoid;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 5px;
+  align-items: baseline;
+}
+
+.info-row .label {
+  min-width: 130px;
+  font-weight: normal;
+}
+
+.info-row .colon {
+  margin: 0 8px;
+  min-width: 10px;
+}
+
+.info-row .value {
+  font-weight: bold;
+  flex: 1;
+}
+
+/* ==================== NILAI TABLE STYLES (MODERN) ==================== */
+.nilai-section {
+  margin: 25px 0;
+  page-break-inside: avoid;
+}
+
+.nilai-section h3 {
+  font-size: 13pt;
+  font-weight: bold;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 3px solid #1a365d;
+  color: #1a365d;
+  letter-spacing: 0.5px;
+}
+
+.table-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+  margin: 10px 0;
+}
+
+.nilai-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.nilai-table thead tr {
+  background-color: #4a5568;
+  color: white;
+}
+
+.nilai-table th {
+  padding: 14px 12px;
+  font-size: 9pt;
+  font-weight: bold;
+  border: none;
+  border-bottom: 2px solid #2d3748;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.nilai-table th.th-center {
+  text-align: center;
+}
+
+.nilai-table th.th-left {
+  text-align: left;
+}
+
+.nilai-table th.th-right {
+  text-align: right;
+}
+
+.nilai-table tbody tr.row-even {
+  background-color: #ffffff;
+}
+
+.nilai-table tbody tr.row-odd {
+  background-color: #f7fafc;
+}
+
+.nilai-table td {
+  padding: 12px;
+  border: none;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 10pt;
+}
+
+.nilai-table td.td-center {
+  text-align: center;
+}
+
+.nilai-table td.td-left {
+  text-align: left;
+}
+
+.nilai-table td.td-right {
+  text-align: right;
+}
+
+.nilai-table td.td-no {
+  color: #718096;
+  font-weight: 600;
+}
+
+.nilai-table td.td-mapel {
+  color: #2d3748;
+  font-weight: 500;
+  font-size: 10pt;
+}
+
+.nilai-table td.td-nilai {
+  color: #1a365d;
+  font-size: 11pt;
+}
+
+.nilai-table td.td-guru {
+  color: #718096;
+  font-size: 8.5pt;
+}
+
+.nilai-table td.td-empty {
+  padding: 25px;
+  font-style: italic;
+  color: #a0aec0;
+  text-align: center;
+}
+
+.nilai-empty {
+  color: #c0c4ce;
+  font-style: italic;
+  font-size: 8pt;
+}
+
+/* Grade Pills */
+.grade-pill {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 9pt;
+  min-width: 40px;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+.grade-pill.grade-a {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.grade-pill.grade-b {
+  background-color: #bee3f8;
+  color: #2c5282;
+}
+
+.grade-pill.grade-c {
+  background-color: #feebc8;
+  color: #7c2d12;
+}
+
+.grade-pill.grade-d {
+  background-color: #fed7d7;
+  color: #742a2a;
+}
+
+.grade-pill.grade-e {
+  background-color: #feb2b2;
+  color: #742a2a;
+}
+
+.grade-pill.grade-empty {
+  background-color: #edf2f7;
+  color: #a0aec0;
+  font-style: italic;
+}
+
+/* ==================== CATATAN PERKEMBANGAN STYLES ==================== */
+.catatan-section {
+  margin: 25px 0;
+  page-break-inside: avoid;
+}
+
+.catatan-section h3 {
+  font-size: 13pt;
+  font-weight: bold;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 3px solid #1a365d;
+  color: #1a365d;
+  letter-spacing: 0.5px;
+}
+
+.catatan-item {
+  margin-bottom: 10px;
+  padding: 12px 15px;
+  border: 1px solid #e2e8f0;
+  background-color: #f7fafc;
+  border-radius: 8px;
+  page-break-inside: avoid;
+  min-height: 50px;
+}
+
+.catatan-meta {
+  font-size: 9pt;
+  color: #718096;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.catatan-date {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.catatan-separator {
+  margin: 0 6px;
+  color: #a0aec0;
+}
+
+.catatan-author {
+  font-style: italic;
+  color: #718096;
+}
+
+.catatan-text {
+  font-size: 10pt;
+  line-height: 1.6;
+  margin: 0;
+  color: #2d3748;
+  text-align: left;
+}
+
+.catatan-empty {
+  padding: 20px;
+  text-align: center;
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.catatan-empty p {
+  font-size: 9pt;
+  font-style: italic;
+  color: #a0aec0;
+  margin: 0;
+}
+
+/* ==================== CATATAN WALI KELAS STYLES ==================== */
+.catatan-wali-section {
+  margin: 20px 0;
+  page-break-inside: avoid;
+}
+
+.catatan-wali-section h3 {
+  font-size: 12pt;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #333;
+}
+
+.catatan-wali-content {
+  padding: 15px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  min-height: 60px;
+}
+
+.catatan-wali-content p {
+  font-size: 10pt;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ==================== ABSENSI REKAPITULASI STYLES ==================== */
+.absensi-section {
+  margin: 25px 0;
+  page-break-inside: avoid;
+}
+
+.absensi-section h3 {
+  font-size: 13pt;
+  font-weight: bold;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 3px solid #1a365d;
+  color: #1a365d;
+  letter-spacing: 0.5px;
+}
+
+.absensi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin: 10px 0;
+  padding: 18px;
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.absensi-item {
+  text-align: center;
+  padding: 12px 0;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.absensi-label {
+  font-size: 9pt;
+  font-weight: 500;
+  color: #718096;
+  margin-bottom: 6px;
+}
+
+.absensi-value {
+  font-size: 18pt;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 0;
+}
+
+/* ==================== LEGACY TABLE STYLES ==================== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid #000;
+  padding: 6px;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: #e8e8e8;
+  font-weight: bold;
+  text-align: center;
+}
+
+.data-table td.center {
+  text-align: center;
+}
+
+/* ==================== NOTES LIST STYLES ==================== */
+.notes-list {
+  margin: 10px 0;
+}
+
+.note-item {
+  margin-bottom: 15px;
+  page-break-inside: avoid;
+}
+
+.note-header {
+  font-size: 10pt;
+  color: #555;
+}
+
+.note-header .note-number {
+  font-weight: bold;
+}
+
+.note-header .note-author {
+  font-weight: bold;
+}
+
+.note-header .note-subject {
+  font-style: italic;
+}
+
+.note-content {
+  margin-top: 3px;
+}
+
+/* ==================== BADGE STYLES ==================== */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 8pt;
+  font-weight: bold;
+  border-radius: 3px;
+  margin-left: 5px;
+  color: white;
+}
+
+.badge-positif {
+  background-color: #28a745;
+}
+
+.badge-negatif {
+  background-color: #dc3545;
+}
+
+.badge-netral {
+  background-color: #6c757d;
+}
+
+/* ==================== SIGNATURE STYLES ==================== */
+.footer-section {
+  margin-top: 40px;
+  page-break-inside: avoid;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footer-right {
+  align-items: flex-end;
+}
+
+.footer-date {
+  font-size: 10pt;
+  margin-bottom: 8px;
+}
+
+.footer-role {
+  font-size: 10pt;
+  font-weight: bold;
+  margin-bottom: 60px;
+}
+
+.footer-sign-space {
+  height: 40px; /* ruang tanda tangan */
+}
+
+.footer-name {
+  font-size: 10pt;
+  font-weight: bold;
+  text-decoration: underline;
+  margin-top: 8px;
+}
+/* ==================== UTILITY STYLES ==================== */
+.no-data {
+  text-align: center;
+  font-style: italic;
+  color: #999;
+  padding: 20px;
+}
+
+/* Legacy Grade Color Coding - Deprecated, use grade-pill instead */
+.grade-a {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.grade-b {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.grade-c {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.grade-d {
+  color: #fd7e14;
+  font-weight: bold;
+}
+
+.grade-e {
+  color: #dc3545;
+  font-weight: bold;
+}

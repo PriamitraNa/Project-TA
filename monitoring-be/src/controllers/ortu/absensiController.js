@@ -42,7 +42,7 @@ export const getTahunAjaran = async (req, res, next) => {
 /**
  * GET /api/ortu/absensi/semester
  * Get daftar semester berdasarkan tahun ajaran yang dipilih
- * Query param: tahun_ajaran_id (required)
+ * Query param: tahun_ajaran (required) - string tahun ajaran (misal: '2025/2026')
  * Authorization: Bearer token (ortu login)
  */
 export const getSemester = async (req, res, next) => {
@@ -57,17 +57,17 @@ export const getSemester = async (req, res, next) => {
       })
     }
 
-    // Validasi tahun_ajaran_id dari query parameter
-    const tahunAjaranId = req.query.tahun_ajaran_id
+    // Validasi tahun_ajaran dari query parameter
+    const tahunAjaran = req.query.tahun_ajaran
 
-    if (!tahunAjaranId) {
+    if (!tahunAjaran) {
       return res.status(400).json({
         status: 'error',
-        message: 'Parameter tahun_ajaran_id wajib diisi',
+        message: 'Parameter tahun_ajaran wajib diisi',
       })
     }
 
-    const data = await absensiService.getSemesterService(siswaId, tahunAjaranId)
+    const data = await absensiService.getSemesterService(siswaId, tahunAjaran)
 
     if (!data || data.length === 0) {
       return res.status(404).json({

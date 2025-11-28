@@ -1,4 +1,4 @@
-import db from '../../config/db.js';
+import db from '../../config/db.js'
 
 /**
  * Get siswa yang sudah memiliki data nilai
@@ -20,45 +20,45 @@ export const getSiswaWithNilai = ({ kelas_id, tahun_ajaran_id, search }) => {
       INNER JOIN kelas k ON n.kelas_id = k.id
       INNER JOIN tahun_ajaran ta ON n.tahun_ajaran_id = ta.id
       WHERE 1=1
-    `;
-    
-    const params = [];
-    
+    `
+
+    const params = []
+
     // Filter by tahun_ajaran_id (default: aktif)
     if (tahun_ajaran_id) {
-      query += ` AND n.tahun_ajaran_id = ?`;
-      params.push(tahun_ajaran_id);
+      query += ` AND n.tahun_ajaran_id = ?`
+      params.push(tahun_ajaran_id)
     } else {
-      query += ` AND ta.status = 'aktif'`;
+      query += ` AND ta.status = 'aktif'`
     }
-    
+
     // Filter by kelas_id
     if (kelas_id) {
-      query += ` AND n.kelas_id = ?`;
-      params.push(kelas_id);
+      query += ` AND n.kelas_id = ?`
+      params.push(kelas_id)
     }
-    
+
     // Search by nama or NISN
     if (search) {
-      query += ` AND (s.nama_lengkap LIKE ? OR s.nisn LIKE ?)`;
-      const searchPattern = `%${search}%`;
-      params.push(searchPattern, searchPattern);
+      query += ` AND (s.nama_lengkap LIKE ? OR s.nisn LIKE ?)`
+      const searchPattern = `%${search}%`
+      params.push(searchPattern, searchPattern)
     }
-    
+
     // Group by siswa
     query += `
       GROUP BY s.id, s.nama_lengkap, s.nisn, k.nama_kelas, ta.tahun, ta.semester
       ORDER BY s.nama_lengkap ASC
-    `;
-    
+    `
+
     db.query(query, params, (error, results) => {
       if (error) {
-        return reject(error);
+        return reject(error)
       }
-      resolve(results);
-    });
-  });
-};
+      resolve(results)
+    })
+  })
+}
 
 /**
  * Get siswa info with current kelas and nama ortu
@@ -80,23 +80,26 @@ export const getSiswaInfoWithKelas = (siswaId) => {
            WHERE os.siswa_id = s.id 
            LIMIT 1),
           'Tidak Ada Data'
-        ) AS nama_ortu
+        ) AS nama_ortu,
+        COALESCE(g.nama_lengkap, '-') AS wali_kelas_nama,
+        COALESCE(g.nip, '-') AS wali_kelas_nip
       FROM siswa s
       LEFT JOIN kelas_siswa ks ON s.id = ks.siswa_id 
         AND ks.tahun_ajaran_id = (SELECT id FROM tahun_ajaran WHERE status = 'aktif' LIMIT 1)
       LEFT JOIN kelas k ON ks.kelas_id = k.id
+      LEFT JOIN guru g ON k.wali_kelas_id = g.id
       WHERE s.id = ?
       LIMIT 1
-    `;
-    
+    `
+
     db.query(query, [siswaId], (error, results) => {
       if (error) {
-        return reject(error);
+        return reject(error)
       }
-      resolve(results[0] || null);
-    });
-  });
-};
+      resolve(results[0] || null)
+    })
+  })
+}
 
 /**
  * Get nilai per semester dengan tahun_ajaran_id dan mapel_id
@@ -124,16 +127,16 @@ export const getNilaiPerSemesterWithId = (siswaId) => {
       INNER JOIN mapel m ON n.mapel_id = m.id
       WHERE n.siswa_id = ?
       ORDER BY ta.tahun DESC, ta.semester ASC, m.nama_mapel ASC
-    `;
-    
+    `
+
     db.query(query, [siswaId], (error, results) => {
       if (error) {
-        return reject(error);
+        return reject(error)
       }
-      resolve(results);
-    });
-  });
-};
+      resolve(results)
+    })
+  })
+}
 
 /**
  * Get absensi per semester
@@ -154,20 +157,149 @@ export const getAbsensiPerSemester = (siswaId) => {
       WHERE a.siswa_id = ?
       GROUP BY ta.id, ta.semester
       ORDER BY ta.tahun DESC, ta.semester ASC
-    `;
-    
+    `
+
     db.query(query, [siswaId], (error, results) => {
       if (error) {
-        return reject(error);
+        return reject(error)
       }
-      resolve(results);
-    });
-  });
-};
+      resolve(results)
+    })
+  })
+}
+
+/**
+ * Get all tahun ajaran (for dropdown)
+ */
+export const getAllTahunAjaran = () => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        id,
+        tahun,
+        semester,
+        status
+      FROM tahun_ajaran
+      WHERE status = 'aktif'
+      ORDER BY tahun DESC, 
+        CASE WHEN semester = 'Ganjil' THEN 1 ELSE 2 END ASC
+    `
+
+    db.query(query, (error, results) => {
+      if (error) {
+        return reject(error)
+      }
+      resolve(results)
+    })
+  })
+}
+
+/**
+ * Get kelas by tahun ajaran (for dropdown)
+ */
+export const getKelasByTahunAjaran = (tahunAjaranId) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT DISTINCT
+        k.id,
+        k.nama_kelas
+      FROM kelas k
+      WHERE k.tahun_ajaran_id = ?
+      ORDER BY k.nama_kelas ASC
+    `
+
+    db.query(query, [tahunAjaranId], (error, results) => {
+      if (error) {
+        return reject(error)
+      }
+      resolve(results)
+    })
+  })
+}
+
+/**
+ * Get siswa by kelas and tahun ajaran (for dropdown)
+ */
+export const getSiswaByKelasAndTahun = (kelasId, tahunAjaranId) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT DISTINCT
+        s.id,
+        s.nama_lengkap AS nama,
+        s.nisn
+      FROM siswa s
+      INNER JOIN kelas_siswa ks ON s.id = ks.siswa_id
+      WHERE ks.kelas_id = ?
+        AND ks.tahun_ajaran_id = ?
+      ORDER BY s.nama_lengkap ASC
+    `
+
+    db.query(query, [kelasId, tahunAjaranId], (error, results) => {
+      if (error) {
+        return reject(error)
+      }
+      resolve(results)
+    })
+  })
+}
+
+/**
+ * Get all siswa IDs in a kelas for bulk generation
+ */
+export const getAllSiswaIdsByKelas = (kelasId, tahunAjaranId) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT DISTINCT
+        s.id AS siswa_id
+      FROM siswa s
+      INNER JOIN kelas_siswa ks ON s.id = ks.siswa_id
+      WHERE ks.kelas_id = ?
+        AND ks.tahun_ajaran_id = ?
+      ORDER BY s.nama_lengkap ASC
+    `
+
+    db.query(query, [kelasId, tahunAjaranId], (error, results) => {
+      if (error) {
+        return reject(error)
+      }
+      resolve(results)
+    })
+  })
+}
+
+/**
+ * Get kelas info by ID
+ */
+export const getKelasInfo = (kelasId) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        k.id,
+        k.nama_kelas,
+        ta.tahun AS tahun_ajaran
+      FROM kelas k
+      INNER JOIN tahun_ajaran ta ON k.tahun_ajaran_id = ta.id
+      WHERE k.id = ?
+      LIMIT 1
+    `
+
+    db.query(query, [kelasId], (error, results) => {
+      if (error) {
+        return reject(error)
+      }
+      resolve(results[0] || null)
+    })
+  })
+}
 
 export default {
   getSiswaWithNilai,
   getSiswaInfoWithKelas,
   getNilaiPerSemesterWithId,
-  getAbsensiPerSemester
-};
+  getAbsensiPerSemester,
+  getAllTahunAjaran,
+  getKelasByTahunAjaran,
+  getSiswaByKelasAndTahun,
+  getAllSiswaIdsByKelas,
+  getKelasInfo,
+}

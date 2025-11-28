@@ -3,6 +3,7 @@ import { API_URL } from '../../api'
 
 export const AbsensiAnakService = {
   // GET /api/ortu/absensi/tahun-ajaran - Get daftar tahun ajaran
+  // Response: { status: "success", data: { tahun_ajaran: [{ "tahun": "2025/2026" }, { "tahun": "2024/2025" }] } }
   getTahunAjaran: async () => {
     const res = await axios.get(`${API_URL}/ortu/absensi/tahun-ajaran`, {
       headers: {
@@ -12,11 +13,12 @@ export const AbsensiAnakService = {
     return res.data
   },
 
-  // GET /api/ortu/absensi/semester - Get daftar semester berdasarkan tahun ajaran
-  getSemester: async (tahunAjaranId) => {
+  // GET /api/ortu/absensi/semester?tahun_ajaran=2025/2026 - Get daftar semester
+  // Response: { status: "success", data: { semester: [{ "id": 1, "nama": "Semester 1 (Ganjil)", "value": "1" }] } }
+  getSemester: async (tahunAjaran) => {
     const res = await axios.get(`${API_URL}/ortu/absensi/semester`, {
       params: {
-        tahun_ajaran_id: tahunAjaranId,
+        tahun_ajaran: tahunAjaran,
       },
       headers: {
         Authorization: `Bearer ${localStorage.getItem('authToken')}`,
@@ -25,7 +27,8 @@ export const AbsensiAnakService = {
     return res.data
   },
 
-  // GET /api/ortu/absensi/bulan - Get daftar bulan berdasarkan semester
+  // GET /api/ortu/absensi/bulan?tahun_ajaran_id=1&semester=1 - Get daftar bulan
+  // tahunAjaranId: id dari response semester, semester: value dari semester ("1" atau "2")
   getBulan: async (tahunAjaranId, semester) => {
     const res = await axios.get(`${API_URL}/ortu/absensi/bulan`, {
       params: {

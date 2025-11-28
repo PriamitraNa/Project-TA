@@ -1,0 +1,24 @@
+<!-- Rekapitulasi Absensi: Untuk semua role -->
+<% if (typeof absensi !== 'undefined') { %>
+<div class="absensi-section">
+  <h3>REKAPITULASI ABSENSI</h3>
+  <div class="absensi-grid">
+    <div class="absensi-item">
+      <span class="absensi-label">Hadir</span>
+      <span class="absensi-value"><%= absensi.hadir %></span>
+    </div>
+    <div class="absensi-item">
+      <span class="absensi-label">Sakit</span>
+      <span class="absensi-value"><%= absensi.sakit %></span>
+    </div>
+    <div class="absensi-item">
+      <span class="absensi-label">Izin</span>
+      <span class="absensi-value"><%= absensi.izin %></span>
+    </div>
+    <div class="absensi-item">
+      <span class="absensi-label">Alpha</span>
+      <span class="absensi-value"><%= absensi.alpha %></span>
+    </div>
+  </div>
+</div>
+<% } %>

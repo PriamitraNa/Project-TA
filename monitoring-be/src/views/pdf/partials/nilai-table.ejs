@@ -1,0 +1,47 @@
+<!-- Nilai Table Section: Enhanced Modern Design -->
+<div class="nilai-section">
+  <h3>DAFTAR NILAI</h3>
+  <div class="table-container">
+    <table class="nilai-table">
+      <thead>
+        <tr>
+          <th class="th-center" style="width: 50px">NO</th>
+          <th class="th-left">MATA PELAJARAN</th>
+          <th class="th-right" style="width: 100px">NILAI AKHIR</th>
+          <th class="th-center" style="width: 80px">GRADE</th>
+          <th class="th-left" style="width: 150px">GURU PENGAJAR</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (typeof nilai_akademik !== 'undefined' && nilai_akademik.length > 0) { %> <%
+        nilai_akademik.forEach((mapel, index) => { %>
+        <tr class="<%= index % 2 === 0 ? 'row-even' : 'row-odd' %>">
+          <td class="td-center td-no"><%= index + 1 %></td>
+          <td class="td-left td-mapel"><%= mapel.nama_mapel %></td>
+          <td class="td-right td-nilai">
+            <% if (mapel.nilai_akhir !== null && mapel.nilai_akhir !== undefined) { %>
+            <strong><%= mapel.nilai_akhir.toFixed(2).replace('.', ',') %></strong>
+            <% } else { %>
+            <span class="nilai-empty">Belum Ada</span>
+            <% } %>
+          </td>
+          <td class="td-center">
+            <% if (mapel.grade && mapel.grade !== '-') { %>
+            <span class="grade-pill grade-<%= mapel.grade.toLowerCase() %>"
+              ><%= mapel.grade %></span
+            >
+            <% } else { %>
+            <span class="grade-pill grade-empty">—</span>
+            <% } %>
+          </td>
+          <td class="td-left td-guru"><%= mapel.guru_nama || '—' %></td>
+        </tr>
+        <% }) %> <% } else { %>
+        <tr>
+          <td colspan="5" class="td-center td-empty">Belum ada data nilai</td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>

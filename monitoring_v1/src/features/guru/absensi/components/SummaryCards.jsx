@@ -1,4 +1,4 @@
-import { FaUsers, FaCheck, FaChartBar } from 'react-icons/fa';
+import { FaUsers, FaCheck, FaChartBar } from 'react-icons/fa'
 
 /**
  * SummaryCards Component
@@ -7,7 +7,7 @@ import { FaUsers, FaCheck, FaChartBar } from 'react-icons/fa';
 export default function SummaryCards({ type, data }) {
   if (type === 'input') {
     return (
-      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex items-center gap-3">
           <div className="p-2 bg-gray-100 rounded-lg">
             <FaUsers className="text-gray-600 text-base" />
@@ -68,7 +68,7 @@ export default function SummaryCards({ type, data }) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   // Rekap type
@@ -124,6 +124,5 @@ export default function SummaryCards({ type, data }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
-

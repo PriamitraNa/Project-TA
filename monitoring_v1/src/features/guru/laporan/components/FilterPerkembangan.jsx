@@ -1,6 +1,6 @@
-import ContentWrapper from '../../../../components/ui/ContentWrapper';
-import FilterDropdown from '../../../../components/ui/FilterDropdown';
-import { FaFilter, FaUser, FaCalendarAlt } from 'react-icons/fa';
+import ContentWrapper from '../../../../components/ui/ContentWrapper'
+import FilterDropdown from '../../../../components/ui/FilterDropdown'
+import { FaFilter, FaUser, FaCalendarAlt } from 'react-icons/fa'
 
 export default function FilterPerkembangan({
   selectedKelas,
@@ -21,9 +21,7 @@ export default function FilterPerkembangan({
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Filter Laporan</h3>
-            <p className="text-sm text-gray-600">
-              Pilih siswa untuk melihat laporan perkembangan
-            </p>
+            <p className="text-sm text-gray-600">Pilih siswa untuk melihat laporan perkembangan</p>
           </div>
         </div>
 
@@ -35,7 +33,7 @@ export default function FilterPerkembangan({
               Kelas Wali
             </label>
             <div className="px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 font-medium">
-              {kelasOptions.find(k => k.value === selectedKelas)?.label || 'Loading...'}
+              {kelasOptions.find((k) => k.value === selectedKelas)?.label || 'Loading...'}
             </div>
           </div>
 
@@ -46,7 +44,9 @@ export default function FilterPerkembangan({
               Periode Aktif
             </label>
             <div className="px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 font-medium">
-              {periodeInfo ? `${periodeInfo.tahun_ajaran} • Sem. ${periodeInfo.semester}` : 'Loading...'}
+              {periodeInfo
+                ? `${periodeInfo.tahun_ajaran} • Sem. ${periodeInfo.semester}`
+                : 'Loading...'}
             </div>
           </div>
 
@@ -60,13 +60,12 @@ export default function FilterPerkembangan({
               onChange={onSiswaChange}
               options={siswaOptions}
               showDefaultOption={true}
-              defaultOptionLabel="-- Pilih Siswa --"
+              placeholder="Pilih Siswa"
               disabled={isLoadingSiswa || siswaOptions.length === 0}
             />
           </div>
         </div>
       </div>
     </ContentWrapper>
-  );
+  )
 }
-

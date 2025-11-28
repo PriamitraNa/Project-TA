@@ -58,7 +58,7 @@ export const getSiswaListService = async (guruId, kelasId) => {
 
     // Get siswa list
     const siswaList = await laporanModel.getSiswaByKelas(kelasId)
-    
+
     if (!siswaList || siswaList.length === 0) {
       throw new Error('Tidak ada siswa di kelas ini')
     }
@@ -109,27 +109,43 @@ export const getPerkembanganSiswaService = async (guruId, siswaId) => {
     // Format response
     return {
       siswa: siswaDetail,
-      nilai_akademik: nilaiAkademik.map(nilai => ({
+      nilai_akademik: nilaiAkademik.map((nilai) => ({
         mapel_id: nilai.mapel_id,
         nama_mapel: nilai.nama_mapel,
         nilai_akhir: nilai.nilai_akhir ? parseFloat(nilai.nilai_akhir) : null,
-        grade: nilai.nilai_akhir ? nilai.grade : null
+        grade: nilai.nilai_akhir ? nilai.grade : null,
       })),
       absensi: {
         hadir: parseInt(absensi.hadir) || 0,
         sakit: parseInt(absensi.sakit) || 0,
         izin: parseInt(absensi.izin) || 0,
-        alpha: parseInt(absensi.alpha) || 0
+        alpha: parseInt(absensi.alpha) || 0,
       },
-      catatan_perkembangan: catatanPerkembangan
+      catatan_perkembangan: catatanPerkembangan.map((catatan) => {
+        const tanggalObj = new Date(catatan.tanggal)
+        const tanggalFormatted = !isNaN(tanggalObj.getTime())
+          ? tanggalObj.toLocaleDateString('id-ID', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            })
+          : catatan.tanggal.split('T')[0].split('-').reverse().join('/')
+
+        return {
+          tanggal: catatan.tanggal,
+          tanggal_formatted: tanggalFormatted,
+          guru_nama: catatan.guru_nama,
+          isi_catatan: catatan.isi_catatan,
+          kategori: catatan.kategori,
+          jenis: catatan.jenis,
+        }
+      }),
     }
   } catch (error) {
     console.error('Error in getPerkembanganSiswaService:', error)
     throw error
   }
 }
-
-
 
 /**
  * Generate PDF Laporan Perkembangan Siswa menggunakan Puppeteer + EJS
@@ -154,7 +170,7 @@ export const generatePDFPerkembanganService = async (guruId, siswaId, catatanWal
 
     // Get guru info for signature
     const guru = await laporanModel.getGuruById(guruId)
-    
+
     // Get tahun ajaran aktif
     const tahunAjaran = await laporanModel.getTahunAjaranAktif()
 
@@ -176,17 +192,24 @@ export const generatePDFPerkembanganService = async (guruId, siswaId, catatanWal
       catatan_perkembangan: perkembanganData.catatan_perkembangan,
       catatan_wali_kelas: catatanWaliKelas,
       tahunAjaran: tahunAjaran,
+      role: 'guru', // Tambahkan role
       tanggal_cetak: new Date().toLocaleDateString('id-ID', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
       }),
-      logoBase64: logoBase64
+      logoBase64: logoBase64,
     }
 
     // Render HTML dari template EJS
     // __dirname = src/services/guru, jadi naik 2 level ke src, lalu masuk views/pdf
     const templatePath = path.join(__dirname, '../../views/pdf/laporan-perkembangan.ejs')
+    const cssPath = path.join(__dirname, '../../views/pdf/styles/pdf-laporan.css')
+    const cssContent = fs.readFileSync(cssPath, 'utf-8')
+
+    // Add CSS content to template data
+    templateData.cssContent = cssContent
+
     const htmlContent = await ejs.renderFile(templatePath, templateData)
 
     // Header Template (Kop Surat - muncul di setiap halaman)
@@ -242,7 +265,7 @@ export const generatePDFPerkembanganService = async (guruId, siswaId, catatanWal
     // Launch Puppeteer
     browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
 
     const page = await browser.newPage()
@@ -256,16 +279,15 @@ export const generatePDFPerkembanganService = async (guruId, siswaId, catatanWal
       headerTemplate: headerTemplate,
       footerTemplate: footerTemplate,
       margin: {
-        top: '140px',    // Area untuk header
-        bottom: '60px',   // Area untuk footer
+        top: '140px', // Area untuk header
+        bottom: '60px', // Area untuk footer
         left: '40px',
-        right: '40px'
-      }
+        right: '40px',
+      },
     })
 
     await browser.close()
     return pdfBuffer
-
   } catch (error) {
     console.error('Error in generatePDFPerkembanganService:', error)
     if (browser) await browser.close()
@@ -279,4 +301,3 @@ export default {
   getPerkembanganSiswaService,
   generatePDFPerkembanganService,
 }
-

@@ -6,11 +6,13 @@ import { GRADE_COLORS } from '../config/constants'
 export const useLaporan = () => {
   // State for tahun ajaran options
   const [tahunAjaranOptions, setTahunAjaranOptions] = useState([])
-  const [selectedTahun, setSelectedTahun] = useState(null)
+  const [selectedTahun, setSelectedTahun] = useState('') // String tahun (e.g., "2025/2026")
 
-  // State for semester options (NEW!)
+  // State for semester options
   const [semesterOptions, setSemesterOptions] = useState([])
-  const [selectedSemester, setSelectedSemester] = useState(null)
+  const [semesterData, setSemesterData] = useState([]) // Data lengkap dengan tahun_ajaran_id
+  const [selectedSemester, setSelectedSemester] = useState('') // Semester value ("1" atau "2")
+  const [selectedTahunAjaranId, setSelectedTahunAjaranId] = useState('') // ID dari semester response
 
   // State for laporan data
   const [siswaInfo, setSiswaInfo] = useState(null)
@@ -31,9 +33,10 @@ export const useLaporan = () => {
         const response = await LaporanService.getTahunAjaran()
 
         if (response.status === 'success') {
+          // Response: [{ "tahun_ajaran": "2025/2026", "is_active": true }]
           const options = response.data.map((item) => ({
-            value: item.id,
-            label: item.label,
+            value: item.tahun_ajaran,
+            label: `T.A ${item.tahun_ajaran}`,
             is_active: item.is_active,
           }))
           setTahunAjaranOptions(options)
@@ -41,9 +44,9 @@ export const useLaporan = () => {
           // Auto-select active tahun ajaran
           const active = response.data.find((item) => item.is_active)
           if (active) {
-            setSelectedTahun(active.id)
+            setSelectedTahun(active.tahun_ajaran)
           } else if (response.data.length > 0) {
-            setSelectedTahun(response.data[0].id)
+            setSelectedTahun(response.data[0].tahun_ajaran)
           }
         }
       } catch (error) {
@@ -64,9 +67,15 @@ export const useLaporan = () => {
     loadTahunAjaran()
   }, [])
 
-  // === API #2: Load Semester Options (NEW!) ===
+  // === API #2: Load Semester Options ===
   useEffect(() => {
-    if (!selectedTahun) return
+    if (!selectedTahun) {
+      setSemesterOptions([])
+      setSemesterData([])
+      setSelectedSemester('')
+      setSelectedTahunAjaranId('')
+      return
+    }
 
     const loadSemester = async () => {
       try {
@@ -74,19 +83,23 @@ export const useLaporan = () => {
         const response = await LaporanService.getSemester(selectedTahun)
 
         if (response.status === 'success') {
-          const options = response.data.map((item) => ({
+          // Response: [{ "tahun_ajaran_id": 1, "semester": "1", "label": "Semester 1 (Ganjil)" }]
+          const semData = response.data
+          setSemesterData(semData)
+
+          const options = semData.map((item) => ({
             value: item.semester,
             label: item.label,
-            has_nilai: item.has_nilai,
           }))
           setSemesterOptions(options)
 
-          // Auto-select first semester or semester with nilai
-          const withNilai = response.data.find((item) => item.has_nilai)
-          if (withNilai) {
-            setSelectedSemester(withNilai.semester)
-          } else if (response.data.length > 0) {
-            setSelectedSemester(response.data[0].semester)
+          // Auto-select first semester
+          if (semData.length > 0) {
+            setSelectedSemester(semData[0].semester)
+            setSelectedTahunAjaranId(semData[0].tahun_ajaran_id.toString())
+          } else {
+            setSelectedSemester('')
+            setSelectedTahunAjaranId('')
           }
         }
       } catch (error) {
@@ -99,6 +112,10 @@ export const useLaporan = () => {
         } else {
           toast.error('Gagal memuat semester')
         }
+        setSemesterOptions([])
+        setSemesterData([])
+        setSelectedSemester('')
+        setSelectedTahunAjaranId('')
       } finally {
         setIsLoadingSemester(false)
       }
@@ -107,14 +124,27 @@ export const useLaporan = () => {
     loadSemester()
   }, [selectedTahun])
 
+  // === Update tahun_ajaran_id when semester changes ===
+  useEffect(() => {
+    if (selectedSemester && semesterData.length > 0) {
+      const selected = semesterData.find((sem) => sem.semester === selectedSemester)
+      if (selected) {
+        setSelectedTahunAjaranId(selected.tahun_ajaran_id.toString())
+      }
+    }
+  }, [selectedSemester, semesterData])
+
   // === API #3: Load Laporan Nilai ===
   useEffect(() => {
-    if (!selectedTahun || !selectedSemester) return
+    if (!selectedTahunAjaranId || !selectedSemester) return
 
     const loadLaporanNilai = async () => {
       try {
         setIsLoading(true)
-        const response = await LaporanService.getLaporanNilai(selectedTahun, selectedSemester)
+        const response = await LaporanService.getLaporanNilai(
+          selectedTahunAjaranId,
+          selectedSemester
+        )
 
         if (response.status === 'success') {
           setSiswaInfo(response.data.siswa)
@@ -153,7 +183,7 @@ export const useLaporan = () => {
     }
 
     loadLaporanNilai()
-  }, [selectedTahun, selectedSemester])
+  }, [selectedTahunAjaranId, selectedSemester])
 
   // Get grade badge color class
   const getPredikatBadge = (predikat) => {
@@ -162,14 +192,14 @@ export const useLaporan = () => {
 
   // === API #4: Handle Download PDF ===
   const handleDownloadPDF = async () => {
-    if (!selectedTahun || !selectedSemester || dataTampil.length === 0) {
+    if (!selectedTahunAjaranId || !selectedSemester || dataTampil.length === 0) {
       toast.error('Tidak ada data untuk diunduh')
       return
     }
 
     try {
       setIsDownloading(true)
-      await LaporanService.downloadPDF(selectedTahun, selectedSemester)
+      await LaporanService.downloadPDF(selectedTahunAjaranId, selectedSemester)
       toast.success('PDF berhasil diunduh')
     } catch (error) {
       console.error('Error downloading PDF:', error)

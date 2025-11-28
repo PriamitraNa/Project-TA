@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
 import LoginPage from '../pages/Login'
+import ChangePassword from '../pages/ChangePassword'
 import ProtectedRoute from '../components/ui/ProtectedRoute'
 
 // Import halaman Admin
@@ -34,6 +35,16 @@ export default function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+
+      {/* Change Password - Protected route untuk user yang harus ganti password */}
+      <Route
+        path="/change-password"
+        element={
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Rute Admin - hanya bisa diakses oleh role 'admin' */}
       <Route

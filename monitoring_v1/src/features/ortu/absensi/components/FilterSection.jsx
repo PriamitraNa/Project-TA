@@ -32,15 +32,14 @@ export default function FilterSection({
             Tahun Ajaran <span className="text-red-500">*</span>
           </label>
           <select
-            value={selectedTahunAjaran || ''}
+            value={selectedTahunAjaran}
             onChange={(e) => onTahunAjaranChange(e.target.value)}
             disabled={isLoading}
             className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-slate-100 disabled:cursor-not-allowed transition-colors"
           >
-            <option value="">Pilih Tahun Ajaran</option>
             {tahunAjaranList.map((ta) => (
-              <option key={ta.id} value={ta.id}>
-                {ta.tahun} - {ta.semester} {ta.status === 'aktif' && '(Aktif)'}
+              <option key={ta.value} value={ta.value}>
+                {ta.label}
               </option>
             ))}
           </select>
@@ -52,15 +51,14 @@ export default function FilterSection({
             Semester <span className="text-red-500">*</span>
           </label>
           <select
-            value={selectedSemester || ''}
+            value={selectedSemester}
             onChange={(e) => onSemesterChange(e.target.value)}
             disabled={isLoading || !selectedTahunAjaran}
             className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-slate-100 disabled:cursor-not-allowed transition-colors"
           >
-            <option value="">Pilih Semester</option>
             {semesterList.map((semester) => (
-              <option key={semester.id} value={semester.value}>
-                {semester.nama} {semester.status === 'aktif' && '✓'}
+              <option key={semester.value} value={semester.value}>
+                {semester.label}
               </option>
             ))}
           </select>
@@ -70,7 +68,7 @@ export default function FilterSection({
         <div>
           <label className="block text-xs font-semibold text-slate-700 mb-2">Bulan</label>
           <select
-            value={selectedBulan || ''}
+            value={selectedBulan}
             onChange={(e) => onBulanChange(e.target.value)}
             disabled={isLoading || !selectedSemester}
             className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-slate-100 disabled:cursor-not-allowed transition-colors"

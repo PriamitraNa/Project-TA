@@ -1,15 +1,15 @@
-import ContentWrapper from '../../components/ui/ContentWrapper';
-import PageHeader from '../../components/ui/PageHeader';
-import Button from '../../components/ui/Button';
-import { FaFileDownload, FaUserGraduate } from 'react-icons/fa';
-import { FaRegFilePdf } from 'react-icons/fa6';
-import { 
-  useLaporanPerkembangan, 
-  FilterPerkembangan, 
-  PreviewLaporanPerkembangan, 
+import ContentWrapper from '../../components/ui/ContentWrapper'
+import PageHeader from '../../components/ui/PageHeader'
+import Button from '../../components/ui/Button'
+import { FaFileDownload, FaUserGraduate } from 'react-icons/fa'
+import { FaRegFilePdf } from 'react-icons/fa6'
+import {
+  useLaporanPerkembangan,
+  FilterPerkembangan,
+  PreviewLaporanPerkembangan,
   CatatanWaliKelas,
-  NotWaliKelasCard
-} from '../../features/guru/laporan';
+  NotWaliKelasCard,
+} from '../../features/guru/laporan'
 
 export default function LaporanGuru() {
   const {
@@ -17,37 +17,37 @@ export default function LaporanGuru() {
     selectedKelas,
     selectedSiswa,
     setSelectedSiswa,
-    
+
     // Options
     kelasOptions,
     siswaOptions,
-    
+
     // Data
     laporanData,
     periodeInfo,
     catatanWaliKelas,
     setCatatanWaliKelas,
-    
+
     // Loading states
     isLoading,
     isLoadingKelas,
     isLoadingSiswa,
-    
+
     // Error states
     isNotWaliKelas,
     errorMessage,
-    
+
     // Actions
     canGenerateReport,
     handleDownloadPDF,
-  } = useLaporanPerkembangan();
+  } = useLaporanPerkembangan()
 
   return (
     <div className="space-y-6">
       <PageHeader
         icon={<FaFileDownload />}
-        title="Laporan Perkembangan Siswa"
-        description="Generate laporan lengkap perkembangan siswa untuk keperluan rapor dan dokumentasi"
+        title="Laporan Nilai Siswa"
+        description="Laporan lengkap perkembangan siswa"
       />
 
       {/* Loading State - Initial Load */}
@@ -61,9 +61,7 @@ export default function LaporanGuru() {
       )}
 
       {/* Error State - Not Wali Kelas */}
-      {!isLoadingKelas && isNotWaliKelas && (
-        <NotWaliKelasCard message={errorMessage} />
-      )}
+      {!isLoadingKelas && isNotWaliKelas && <NotWaliKelasCard message={errorMessage} />}
 
       {/* Filter Section */}
       {!isLoadingKelas && !isNotWaliKelas && (
@@ -91,11 +89,8 @@ export default function LaporanGuru() {
       {/* Preview Laporan */}
       {!isNotWaliKelas && canGenerateReport && !isLoading && (
         <>
-          <PreviewLaporanPerkembangan 
-            laporanData={laporanData} 
-            periodeInfo={periodeInfo}
-          />
-          
+          <PreviewLaporanPerkembangan laporanData={laporanData} periodeInfo={periodeInfo} />
+
           {/* Catatan Wali Kelas */}
           <CatatanWaliKelas
             value={catatanWaliKelas}
@@ -112,8 +107,8 @@ export default function LaporanGuru() {
                   Pastikan catatan wali kelas sudah diisi sebelum download PDF
                 </p>
               </div>
-              <Button 
-                variant="danger" 
+              <Button
+                variant="danger"
                 icon={<FaRegFilePdf />}
                 onClick={handleDownloadPDF}
                 disabled={!catatanWaliKelas.trim()}
@@ -130,15 +125,13 @@ export default function LaporanGuru() {
         <ContentWrapper>
           <div className="text-center py-12">
             <FaUserGraduate className="text-6xl text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Pilih Siswa
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Pilih Siswa</h3>
             <p className="text-gray-600">
-              Silakan pilih siswa terlebih dahulu untuk melihat laporan perkembangan
+              Silakan pilih siswa terlebih dahulu untuk melihat laporan nilai
             </p>
           </div>
         </ContentWrapper>
       )}
     </div>
-  );
+  )
 }

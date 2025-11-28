@@ -7,6 +7,8 @@ import { useChatGuru, ConversationList, ChatArea, NewChatModal } from '../../fea
 export default function ChatGuru() {
   // State for modal
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false)
+  // State for mobile view - show conversation list or chat area
+  const [showChatOnMobile, setShowChatOnMobile] = useState(false)
 
   const {
     // State
@@ -34,6 +36,17 @@ export default function ChatGuru() {
     setIsNewChatModalOpen(true)
   }
 
+  // Handle select conversation - show chat on mobile
+  const handleSelectConv = (conversation) => {
+    handleSelectConversation(conversation)
+    setShowChatOnMobile(true)
+  }
+
+  // Handle back to conversation list on mobile
+  const handleBackToList = () => {
+    setShowChatOnMobile(false)
+  }
+
   // Handle conversation created from new chat modal
   const handleConversationCreated = async (conversation, isExisting) => {
     // Reload conversations to get updated list
@@ -59,12 +72,14 @@ export default function ChatGuru() {
             ...conversation,
           })
         }
+        // Show chat area on mobile
+        setShowChatOnMobile(true)
       }, 300)
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 md:space-y-6">
       {/* Page Header */}
       <PageHeader
         icon={<FaComments />}
@@ -76,22 +91,22 @@ export default function ChatGuru() {
 
       {/* Chat Container */}
       <ContentWrapper>
-        <div className="flex h-[calc(100vh-280px)] bg-white rounded-lg shadow-sm overflow-hidden">
-          {/* Conversations Sidebar */}
-          <div className="w-1/3 border-r border-gray-200 flex flex-col">
+        <div className="flex h-[calc(100vh-200px)] md:h-[calc(100vh-280px)] bg-white rounded-lg shadow-sm overflow-hidden">
+          {/* Conversations Sidebar - Hidden on mobile when chat is open */}
+          <div className={`${showChatOnMobile ? 'hidden md:flex' : 'flex'} md:flex`}>
             <ConversationList
               conversations={conversations}
               selectedConversation={selectedConversation}
               isLoading={isLoadingConversations}
               searchQuery={searchQuery}
-              onSelectConversation={handleSelectConversation}
+              onSelectConversation={handleSelectConv}
               onNewChatClick={handleNewChatClick}
               onSearchChange={handleSearch}
             />
           </div>
 
-          {/* Chat Area */}
-          <div className="flex-1 flex flex-col">
+          {/* Chat Area - Show on mobile when conversation selected, always show on desktop */}
+          <div className={`${showChatOnMobile ? 'flex' : 'hidden md:flex'} flex-1`}>
             <ChatArea
               selectedConversation={selectedConversation}
               messages={messages}
@@ -101,6 +116,7 @@ export default function ChatGuru() {
               messagesEndRef={messagesEndRef}
               onSendMessage={handleSendMessage}
               onMessageInputChange={setMessageInput}
+              onBackToList={handleBackToList}
             />
           </div>
         </div>

@@ -31,6 +31,7 @@ export default function FilterSection({
                 options={tahunAjaranOptions}
                 className="w-full sm:w-44"
                 disabled={isLoadingOptions}
+                showDefaultOption={false}
               />
             )}
           </div>
@@ -45,6 +46,7 @@ export default function FilterSection({
                 options={semesterOptions}
                 className="w-full sm:w-44"
                 disabled={isLoadingOptions || isLoadingSemester}
+                showDefaultOption={false}
               />
             )}
           </div>

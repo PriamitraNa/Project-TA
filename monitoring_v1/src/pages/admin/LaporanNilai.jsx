@@ -7,13 +7,32 @@ import { useTranskripNilai, FilterSiswa, PreviewTranskrip } from '../../features
 
 export default function LaporanNilai() {
   const {
-    // State
+    // Cascade State
+    tahunAjaranList,
+    kelasList,
+    siswaList,
+
+    // Selected Values
+    selectedTahunAjaran,
+    selectedKelas,
     selectedSiswa,
-    setSelectedSiswa,
-    siswaOptions,
-    transkripData,
-    isLoading,
+    downloadMode,
+
+    // Handlers
+    handleTahunAjaranChange,
+    handleKelasChange,
+    handleSiswaChange,
+    handleModeChange,
+
+    // Loading States
+    isLoadingTahunAjaran,
+    isLoadingKelas,
     isLoadingSiswa,
+    isLoadingTranskrip,
+    isDownloading,
+
+    // Data
+    transkripData,
 
     // Actions
     handleDownloadPDF,
@@ -24,49 +43,54 @@ export default function LaporanNilai() {
     <div className="space-y-6">
       <PageHeader
         icon={<FaFileArrowDown />}
-        title="Transkrip Nilai Siswa"
-        description="Generate transkrip nilai lengkap siswa untuk keperluan dokumentasi dan arsip"
+        title="Laporan Nilai Siswa"
+        description="Nilai lengkap siswa untuk keperluan dokumentasi dan arsip"
       />
 
-      {/* Loading State - Initial Load */}
-      {isLoadingSiswa && (
-        <ContentWrapper>
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Memuat daftar siswa...</p>
-          </div>
-        </ContentWrapper>
-      )}
-
       {/* Filter Section */}
-      {!isLoadingSiswa && (
-        <FilterSiswa
-          selectedSiswa={selectedSiswa}
-          onSiswaChange={(e) => setSelectedSiswa(e.target.value)}
-          siswaOptions={siswaOptions}
-          isLoadingSiswa={isLoadingSiswa}
-        />
-      )}
+      <FilterSiswa
+        tahunAjaranList={tahunAjaranList}
+        kelasList={kelasList}
+        siswaList={siswaList}
+        selectedTahunAjaran={selectedTahunAjaran}
+        selectedKelas={selectedKelas}
+        selectedSiswa={selectedSiswa}
+        downloadMode={downloadMode}
+        onTahunAjaranChange={handleTahunAjaranChange}
+        onKelasChange={handleKelasChange}
+        onSiswaChange={handleSiswaChange}
+        onModeChange={handleModeChange}
+        isLoadingTahunAjaran={isLoadingTahunAjaran}
+        isLoadingKelas={isLoadingKelas}
+        isLoadingSiswa={isLoadingSiswa}
+      />
 
       {/* Action Button - Download PDF */}
-      {!isLoadingSiswa && canDownloadPDF && (
+      {canDownloadPDF && (
         <ContentWrapper>
           <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Download Transkrip</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Generate Transkrip</h3>
               <p className="text-sm text-gray-600 mt-1">
-                Download transkrip nilai dalam format PDF
+                {downloadMode === 'individual'
+                  ? 'Download transkrip nilai siswa dalam format PDF'
+                  : `Download transkrip ${siswaList.length} siswa sekaligus`}
               </p>
             </div>
-            <Button variant="danger" icon={<FaRegFilePdf />} onClick={handleDownloadPDF}>
-              Download PDF
+            <Button
+              variant="danger"
+              icon={<FaRegFilePdf />}
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+            >
+              {isDownloading ? 'Mengunduh...' : 'Generate Transkrip PDF'}
             </Button>
           </div>
         </ContentWrapper>
       )}
 
       {/* Loading State - Data Transkrip */}
-      {isLoading && (
+      {isLoadingTranskrip && (
         <ContentWrapper>
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
@@ -75,17 +99,19 @@ export default function LaporanNilai() {
         </ContentWrapper>
       )}
 
-      {/* Preview Transkrip */}
-      {!isLoading && transkripData && <PreviewTranskrip transkripData={transkripData} />}
+      {/* Preview Transkrip (Individual Mode Only) */}
+      {!isLoadingTranskrip && downloadMode === 'individual' && transkripData && (
+        <PreviewTranskrip transkripData={transkripData} />
+      )}
 
       {/* Empty State */}
-      {!isLoading && !selectedSiswa && !isLoadingSiswa && (
+      {!selectedTahunAjaran && !isLoadingTahunAjaran && (
         <ContentWrapper>
           <div className="text-center py-12">
             <FaUserGraduate className="text-6xl text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Pilih Siswa</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Pilih Tahun Ajaran</h3>
             <p className="text-gray-600">
-              Silakan pilih siswa terlebih dahulu untuk melihat transkrip nilai lengkap
+              Silakan pilih tahun ajaran terlebih dahulu untuk melanjutkan
             </p>
           </div>
         </ContentWrapper>

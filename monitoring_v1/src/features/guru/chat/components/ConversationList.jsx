@@ -16,9 +16,9 @@ export default function ConversationList({
   isLoading,
 }) {
   return (
-    <div className="w-1/3 border-r border-gray-200 flex flex-col">
+    <div className="w-full md:w-80 lg:w-96 border-r border-gray-200 flex flex-col">
       {/* New Chat Button & Search */}
-      <div className="p-4 border-b border-gray-200 space-y-3">
+      <div className="p-3 md:p-4 border-b border-gray-200 space-y-3">
         <Button
           variant="primary"
           icon={<FaPlus />}
@@ -29,13 +29,13 @@ export default function ConversationList({
           New Chat
         </Button>
         <div className="relative">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
           <input
             type="text"
-            placeholder="Cari orang tua atau siswa..."
+            placeholder="Cari orang tua siswa..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
       </div>

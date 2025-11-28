@@ -5,10 +5,10 @@ import nilaiService from '../../services/ortu/nilaiService.js'
  */
 const getSiswaId = async (req) => {
   if (!req.user || !req.user.siswa_id) {
-    throw new Error('Siswa ID tidak ditemukan. Pastikan Anda login sebagai orang tua.');
+    throw new Error('Siswa ID tidak ditemukan. Pastikan Anda login sebagai orang tua.')
   }
-  return req.user.siswa_id;
-};
+  return req.user.siswa_id
+}
 
 /**
  * GET /api/ortu/nilai/tahun-ajaran
@@ -17,7 +17,7 @@ const getSiswaId = async (req) => {
  */
 export const getTahunAjaran = async (req, res, next) => {
   try {
-    const siswaId = await getSiswaId(req);
+    const siswaId = await getSiswaId(req)
 
     const data = await nilaiService.getTahunAjaranService(siswaId)
 
@@ -26,16 +26,16 @@ export const getTahunAjaran = async (req, res, next) => {
       data,
     })
   } catch (error) {
-    console.error('Error in getTahunAjaran:', error.message);
-    
+    console.error('Error in getTahunAjaran:', error.message)
+
     if (error.message === 'Siswa ID tidak ditemukan. Pastikan Anda login sebagai orang tua.') {
       return res.status(401).json({
         status: 'error',
         message: error.message,
-        data: null
-      });
+        data: null,
+      })
     }
-    
+
     next(error)
   }
 }
@@ -44,38 +44,38 @@ export const getTahunAjaran = async (req, res, next) => {
  * GET /api/ortu/nilai/semester
  * Get daftar semester berdasarkan tahun ajaran untuk siswa
  * Authorization: Bearer token (ortu login)
- * Query: tahun_ajaran_id (required)
+ * Query: tahun_ajaran (required) - string tahun ajaran (misal: '2025/2026')
  */
 export const getSemester = async (req, res, next) => {
   try {
-    const siswaId = await getSiswaId(req);
-    const { tahun_ajaran_id } = req.query
+    const siswaId = await getSiswaId(req)
+    const { tahun_ajaran } = req.query
 
-    if (!tahun_ajaran_id) {
+    if (!tahun_ajaran) {
       return res.status(400).json({
         status: 'error',
-        message: 'tahun_ajaran_id wajib diisi',
+        message: 'tahun_ajaran wajib diisi',
         data: null,
       })
     }
 
-    const data = await nilaiService.getSemesterService(siswaId, tahun_ajaran_id)
+    const data = await nilaiService.getSemesterService(siswaId, tahun_ajaran)
 
     res.status(200).json({
       status: 'success',
       data,
     })
   } catch (error) {
-    console.error('Error in getSemester:', error.message);
-    
+    console.error('Error in getSemester:', error.message)
+
     if (error.message === 'Siswa ID tidak ditemukan. Pastikan Anda login sebagai orang tua.') {
       return res.status(401).json({
         status: 'error',
         message: error.message,
-        data: null
-      });
+        data: null,
+      })
     }
-    
+
     next(error)
   }
 }
@@ -84,12 +84,12 @@ export const getSemester = async (req, res, next) => {
  * GET /api/ortu/nilai
  * Get nilai detail siswa dengan statistik
  * Authorization: Bearer token (ortu login)
- * Query: tahun_ajaran_id (required), semester (required)
+ * Query: tahun_ajaran_id (required), semester (required - bisa 'Ganjil'/'Genap' atau '1'/'2')
  */
 export const getNilaiDetail = async (req, res, next) => {
   try {
-    const siswaId = await getSiswaId(req);
-    const { tahun_ajaran_id, semester } = req.query
+    const siswaId = await getSiswaId(req)
+    let { tahun_ajaran_id, semester } = req.query
 
     // Validate tahun_ajaran_id
     if (!tahun_ajaran_id) {
@@ -109,38 +109,39 @@ export const getNilaiDetail = async (req, res, next) => {
       })
     }
 
+    // Convert semester '1'/'2' to 'Ganjil'/'Genap' if needed
+    if (semester === '1') {
+      semester = 'Ganjil'
+    } else if (semester === '2') {
+      semester = 'Genap'
+    }
+
     if (semester !== 'Ganjil' && semester !== 'Genap') {
       return res.status(400).json({
         status: 'error',
-        message: 'semester harus "Ganjil" atau "Genap"',
+        message: 'semester harus "Ganjil", "Genap", "1", atau "2"',
         data: null,
       })
     }
 
     const data = await nilaiService.getNilaiDetailService(siswaId, tahun_ajaran_id, semester)
 
-    if (!data || data.length === 0) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'Data nilai tidak ditemukan untuk periode ini',
-      })
-    }
-
+    // Return empty array if no data (bukan error 404)
     res.status(200).json({
       status: 'success',
-      data,
+      data: data || [],
     })
   } catch (error) {
-    console.error('Error in getNilaiDetail:', error.message);
-    
+    console.error('Error in getNilaiDetail:', error.message)
+
     if (error.message === 'Siswa ID tidak ditemukan. Pastikan Anda login sebagai orang tua.') {
       return res.status(401).json({
         status: 'error',
         message: error.message,
-        data: null
-      });
+        data: null,
+      })
     }
-    
+
     next(error)
   }
 }
